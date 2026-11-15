@@ -76,7 +76,7 @@
     <div id="grid" class="grid">Loading…</div>
 
     <footer>
-      Sources: Cloudflare Status API, AWS RSS, Azure RSS, Google Cloud Atom<br>
+      Sources: Cloudflare, GitHub, DigitalOcean and Oracle status APIs; AWS, Azure and Microsoft 365 Admin Center RSS; Google Cloud Atom<br>
       <a href="https://github.com/AntiNewDomain/cloud-providers-status">View source on GitHub</a>
     </footer>
   </div>
@@ -89,7 +89,7 @@
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
 
-        const order = ['cloudflare', 'aws', 'azure', 'gcp'];
+        const order = ['cloudflare', 'aws', 'azure', 'gcp', 'github', 'digitalocean', 'oracle', 'm365_admin_center'];
         for (const key of order) {
           const p = data.providers[key];
           if (!p) continue;
