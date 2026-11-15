@@ -12,7 +12,6 @@ A free, lightweight monitor that checks the **official public status pages** of 
 | Amazon Web Services   | RSS              | status.aws.amazon.com/rss/all.rss |
 | Microsoft Azure       | RSS              | rssfeed.azure.status.microsoft/en-us/status/feed/ |
 | Google Cloud          | Atom             | status.cloud.google.com/en/feed.atom |
-| GitHub                | JSON API         | githubstatus.com/api/v2/summary.json |
 | DigitalOcean          | JSON API         | status.digitalocean.com/api/v2/summary.json |
 | Oracle Cloud          | JSON API         | ocistatus.oraclecloud.com/api/v2/status.json |
 | Microsoft 365 Admin Center | RSS       | status.cloud.microsoft/api/feed/mac |
@@ -21,7 +20,7 @@ Only official public sources are used. No third-party status aggregators. No Chi
 
 ## Features
 
-- Checks every **15 minutes** automatically
+- Checks every **5 minutes** automatically
 - Live dashboard on GitHub Pages
 - Detects status changes
 - Optional Discord alerts for massive outages only (plus one message when a massive outage clears)

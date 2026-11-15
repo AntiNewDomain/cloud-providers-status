@@ -5,7 +5,7 @@ Checks official status pages for US-based cloud providers and sends a
 Discord alert ONLY on a massive outage (or when one clears).
 Writes status.json.
 
-Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud, GitHub,
+Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud,
 DigitalOcean, Oracle Cloud, plus Microsoft 365 Admin Center (limited —
 see below).
 
@@ -63,11 +63,6 @@ SOURCES = {
         "name": "Google Cloud",
         "url": "https://status.cloud.google.com/en/feed.atom",
         "type": "atom",
-    },
-    "github": {
-        "name": "GitHub",
-        "url": "https://www.githubstatus.com/api/v2/summary.json",
-        "type": "statuspage",
     },
     "digitalocean": {
         "name": "DigitalOcean",
@@ -153,7 +148,9 @@ def fetch_rss_or_atom(key):
     # Only the NEWEST item decides the status, and only if it is recent
     # and unresolved. Old entries (e.g. Sep 15 AWS items still in the feed)
     # must not keep a provider stuck on outage after it resolved.
-    entries = feed.entries[:1]
+    # The last 3 items are still kept in "incidents" so the dashboard can
+    # show recent history — they do not affect the status.
+    entries = feed.entries[:3]
     active = []
     for entry in entries:
         title = entry.get("title", "")
@@ -195,7 +192,7 @@ def fetch_rss_or_atom(key):
         "provider": key,
         "name": info["name"],
         "status": overall,
-        "description": f"Latest item from official feed ({len(active)} recent)",
+        "description": f"Latest items from official feed ({len(active)} recent)",
         "incidents": active,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "source": info["url"],
