@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Providers Status</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid #334155;
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      margin-bottom: 0.75rem;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .operational .dot { background: var(--green); }
+    .degraded .dot { background: var(--yellow); }
+    .outage .dot, .error .dot { background: var(--red); }
+    .meta { font-size: 0.8rem; color: var(--muted); }
+    .incidents {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .incidents li { margin-bottom: 0.4rem; }
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    a { color: var(--blue); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cloud Providers Status</h1>
+    <p class="subtitle">Live status from official sources · Updated every 15 minutes</p>
+
+    <div id="grid" class="grid">Loading…</div>
+
+    <footer>
+      Sources: Cloudflare Status API, AWS RSS, Azure RSS, Google Cloud Atom<br>
+      <a href="https://github.com/AntiNewDomain/cloud-providers-status">View source on GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+    async function load() {
+      try {
+        const res = await fetch('./status.json?t=' + Date.now());
+        const data = await res.json();
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+
+        const order = ['cloudflare', 'aws', 'azure', 'gcp'];
+        for (const key of order) {
+          const p = data.providers[key];
+          if (!p) continue;
+
+          const card = document.createElement('div');
+          card.className = 'card ' + (p.status || 'unknown');
+
+          let incidentsHtml = '';
+          if (p.incidents && p.incidents.length) {
+            incidentsHtml = '<ul class="incidents">' +
+              p.incidents.slice(0, 3).map(i => {
+                const title = i.name || i.title || 'Incident';
+                return `<li>${title}</li>`;
+              }).join('') +
+              '</ul>';
+          }
+
+          card.innerHTML = `
+            <h2>${p.name}</h2>
+            <div class="status ${p.status}">
+              <span class="dot"></span>
+              ${p.status || 'unknown'}
+            </div>
+            <div class="meta">${p.description || ''}</div>
+            ${incidentsHtml}
+            <div class="meta" style="margin-top:0.75rem">Checked: ${new Date(p.checked_at).toLocaleString()}</div>
+          `;
+          grid.appendChild(card);
+        }
+
+        document.querySelector('.subtitle').textContent =
+          `Live status from official sources · Last update: ${new Date(data.updated_at).toLocaleString()}`;
+      } catch (e) {
+        document.getElementById('grid').textContent = 'Failed to load status.json';
+      }
+    }
+    load();
+    setInterval(load, 60000); // refresh every minute
+  </script>
+</body>
+</html>
