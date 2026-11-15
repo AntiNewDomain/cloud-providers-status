@@ -1,40 +1,61 @@
 # Cloud Providers Status Monitor
 
-Free, always-on monitor for the major cloud providers using **only official status sources**.
+A free, lightweight monitor that checks the **official public status pages** of major cloud providers and shows a live dashboard.
 
-**Providers monitored:**
-- Cloudflare (JSON API)
-- Amazon Web Services (official RSS)
-- Microsoft Azure (official RSS)
-- Google Cloud (official Atom)
+**Live Dashboard:** https://antinewdomain.github.io/cloud-providers-status/
+
+## Providers Monitored
+
+| Provider              | Source Type      | Official Endpoint |
+|-----------------------|------------------|-------------------|
+| Cloudflare            | JSON API         | cloudflarestatus.com/api/v2/summary.json |
+| Amazon Web Services   | RSS              | status.aws.amazon.com/rss/all.rss |
+| Microsoft Azure       | RSS              | rssfeed.azure.status.microsoft |
+| Google Cloud          | Atom             | status.cloud.google.com/en/feed.atom |
+
+Only official public sources are used. No third-party status aggregators.
 
 ## Features
-- Runs every 15 minutes via GitHub Actions
-- Detects real status changes
-- Sends Discord alerts when something changes
+
+- Checks every **15 minutes** automatically
 - Live dashboard on GitHub Pages
-- Completely free
+- Detects status changes
+- Optional Discord alerts when status changes
+- Completely free (runs on GitHub Actions)
+- Independent of the providers being monitored
 
-## Setup (already done for most parts)
+## Current Status
 
-1. **Add your Discord webhook**
-   - Go to: https://github.com/AntiNewDomain/cloud-providers-status/settings/secrets/actions
-   - Click **New repository secret**
-   - Name: `DISCORD_WEBHOOK`
-   - Value: your Discord webhook URL
+The monitor is already deployed and running.  
+You only need to complete the optional Discord alert setup if you want notifications.
 
-2. **Enable GitHub Pages** (for the dashboard)
-   - Go to: Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `main` / folder: `/docs`
-   - Save
+### Optional: Enable Discord Alerts
 
-3. The first run will happen automatically on the schedule, or you can trigger it manually under the **Actions** tab.
+1. Create a Discord webhook in your server (Server Settings → Integrations → Webhooks)
+2. Go to [Repository Secrets](https://github.com/AntiNewDomain/cloud-providers-status/settings/secrets/actions)
+3. Click **New repository secret**
+4. Name: `DISCORD_WEBHOOK`
+5. Paste your webhook URL and save
 
-Dashboard will be available at:  
-https://antinewdomain.github.io/cloud-providers-status/
+Once added, you will receive a Discord message whenever a provider status changes.
 
-## How it works
-The workflow runs `scripts/check.py`, which fetches the official endpoints, compares with the previous state, writes `status.json`, and optionally sends a Discord message.
+## Manual Run
 
-You can change the schedule in `.github/workflows/monitor.yml`.
+You can trigger a check immediately:
+
+1. Go to the [Actions tab](https://github.com/AntiNewDomain/cloud-providers-status/actions)
+2. Select **Cloud Status Monitor**
+3. Click **Run workflow**
+
+## Files
+
+- `.github/workflows/monitor.yml` — scheduled workflow
+- `scripts/check.py` — status checker script
+- `docs/` — dashboard (GitHub Pages)
+- `status.json` — latest status data
+
+## Notes
+
+- This uses provider-reported public status only. It is not independent uptime probing.
+- Account-specific health events (AWS Health, Azure Service Health, etc.) are not included.
+- The check interval can be changed in the workflow file if needed.
