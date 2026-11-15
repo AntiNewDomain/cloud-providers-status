@@ -25,7 +25,8 @@
     }
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+    .subtitle { color: var(--muted); margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .countdown { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -72,6 +73,7 @@
   <div class="container">
     <h1>Cloud Providers Status</h1>
     <p class="subtitle">Live status from official sources · Provider checks every 5 minutes · Dashboard refreshes every minute</p>
+    <p class="countdown" id="countdown">Next update in …</p>
 
     <div id="grid" class="grid">Loading…</div>
 
@@ -126,6 +128,34 @@
         document.getElementById('grid').textContent = 'Failed to load status.json';
       }
     }
+
+    // Countdown to the next scheduled provider check.
+    // The workflow runs every 5 minutes at :02, :07, :12, ... (minutes are the same in every timezone).
+    const TICK_MINUTES = [2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57];
+    function nextTick(from) {
+      const d = new Date(from);
+      d.setSeconds(0, 0);
+      for (const m of TICK_MINUTES) {
+        if (m > from.getMinutes()) { d.setMinutes(m); return d; }
+      }
+      d.setDate(d.getDate() + 1);
+      d.setHours(0, 2, 0, 0);
+      return d;
+    }
+    function tickCountdown() {
+      const el = document.getElementById('countdown');
+      if (!el) return;
+      const now = new Date();
+      const next = nextTick(now);
+      const secs = Math.max(0, Math.round((next - now) / 1000));
+      if (secs === 0) { el.textContent = 'Updating…'; return; }
+      const m = Math.floor(secs / 60);
+      const s = String(secs % 60).padStart(2, '0');
+      el.textContent = `Next update in ${m}:${s}`;
+    }
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
+
     load();
     setInterval(load, 60000); // Refresh dashboard data every minute.
     // Refresh promptly when the visitor returns to the tab or window.
