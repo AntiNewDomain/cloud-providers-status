@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T18:39:42.711646+00:00",
+  "updated_at": "2026-11-15T19:10:37.644147+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,14 +15,14 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-15T18:39:41.995789+00:00",
+      "checked_at": "2026-11-15T19:10:32.065821+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
       "provider": "aws",
       "name": "Amazon Web Services",
-      "status": "outage",
-      "description": "Latest items from official feed (8 recent)",
+      "status": "operational",
+      "description": "Latest item from official feed (1 recent)",
       "incidents": [
         {
           "title": "Service is operating normally: [RESOLVED] Increased Connectivity issues in US-EAST-1",
@@ -30,74 +30,25 @@
           "published": "Sun, 15 Nov 2026 06:53:29 PST",
           "severity": "resolved",
           "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service impact: Increased Connectivity issues in US-EAST-1",
-          "summary": "We are seeing significant signs of recovery and are continuing to monitor for full recovery.",
-          "published": "Sun, 15 Nov 2026 06:32:56 PST",
-          "severity": "degraded",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service impact: Increased Connectivity issues in US-EAST-1",
-          "summary": "We can confirm recovery for most AWS Services. We have fully mitigated the issue authentication errors from IAM Identity Center that was impacting Kiro, Connect, and other services which rely on IAM Identity Center for authentication.\n\nWe continue to investigate an issue that is affecting a subset of Network Load Balancers in a single cell, in a single Availability Zone (use1-az1) in the US-EAST-1...",
-          "published": "Sun, 15 Nov 2026 06:23:47 PST",
-          "severity": "degraded",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service impact: Increased Connectivity issues in US-EAST-1",
-          "summary": "We are seeing early signs of recovery for authentication via IAM Identity Center and SignUp.",
-          "published": "Sun, 15 Nov 2026 05:22:11 PST",
-          "severity": "degraded",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service impact: Increased Connectivity issues in US-EAST-1",
-          "summary": "We continue to investigate Connectivity issues in the US-EAST-1 Region. IAM Identity center sign-in requests and AWS SignUp are impacted at this time. \n\nWe can confirm errors when attempted to authenticate when using identity center or when using services that rely on IAM Identity center. For Kiro users, logins from social sign in methods are not impacted at this time. There are no workarounds for...",
-          "published": "Sun, 15 Nov 2026 05:15:45 PST",
-          "severity": "degraded",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service impact: Increased Connectivity issues in US-EAST-1",
-          "summary": "We are investigating reports of Connectivity issues in the US-EAST-1 Region. IAM Identity center sign-in requests and AWS SignUp are also impacted at this time.",
-          "published": "Sun, 15 Nov 2026 04:38:02 PST",
-          "severity": "degraded",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service disruption: Increased Error Rates",
-          "summary": "We are providing an update on the disruption affecting the Middle East (UAE) (me-central-1) Region. After a thorough assessment, we have determined that we are unable to restore access to the resources and data hosted exclusively in the mec1-az2 Availability Zone. We continue to work on recovering regional resources, as well as zonal resources hosted in the other affected Availability Zones (mec1-...",
-          "published": "Tue, 15 Sep 2026 03:27:10 PDT",
-          "severity": "outage",
-          "link": "https://status.aws.amazon.com/"
-        },
-        {
-          "title": "Service disruption: Increased Error Rates",
-          "summary": "We are providing an update on the disruption affecting the Middle East (Bahrain) (me-south-1) Region. The damage to our infrastructure spanned multiple Availability Zones and exceeded what our regional and multi-AZ services are designed to withstand. After a thorough assessment, we have determined that we are unable to restore access to the resources and data hosted exclusively in this Region.\n\nWh...",
-          "published": "Tue, 15 Sep 2026 03:22:28 PDT",
-          "severity": "outage",
-          "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-15T18:39:42.343863+00:00",
+      "checked_at": "2026-11-15T19:10:33.067879+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
       "provider": "azure",
       "name": "Microsoft Azure",
       "status": "operational",
-      "description": "Latest items from official feed (0 recent)",
+      "description": "Latest item from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-15T18:39:42.596584+00:00",
+      "checked_at": "2026-11-15T19:10:33.782591+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
       "provider": "gcp",
       "name": "Google Cloud",
       "status": "operational",
-      "description": "Latest items from official feed (1 recent)",
+      "description": "Latest item from official feed (1 recent)",
       "incidents": [
         {
           "title": "RESOLVED: Multiple services were experiencing issues in the europe-west2 region.",
@@ -107,8 +58,55 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-15T18:39:42.711623+00:00",
+      "checked_at": "2026-11-15T19:10:34.510747+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
+    },
+    "github": {
+      "provider": "github",
+      "name": "GitHub",
+      "status": "operational",
+      "description": "All Systems Operational",
+      "indicator": "none",
+      "incidents": [],
+      "checked_at": "2026-11-15T19:10:35.312103+00:00",
+      "source": "https://www.githubstatus.com/api/v2/summary.json"
+    },
+    "digitalocean": {
+      "provider": "digitalocean",
+      "name": "DigitalOcean",
+      "status": "operational",
+      "description": "All Systems Operational",
+      "indicator": "none",
+      "incidents": [],
+      "checked_at": "2026-11-15T19:10:36.173154+00:00",
+      "source": "https://status.digitalocean.com/api/v2/summary.json"
+    },
+    "oracle": {
+      "provider": "oracle",
+      "name": "Oracle Cloud",
+      "status": "operational",
+      "description": "Normal Performance",
+      "indicator": "none",
+      "incidents": [],
+      "checked_at": "2026-11-15T19:10:36.946143+00:00",
+      "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
+    },
+    "m365_admin_center": {
+      "provider": "m365_admin_center",
+      "name": "Microsoft 365 Admin Center",
+      "status": "operational",
+      "description": "Admin Center availability only \u2014 this feed does NOT cover Outlook/Teams/Exchange Online incidents.",
+      "incidents": [
+        {
+          "title": "Microsoft Admin Center",
+          "summary": "<div>This site is updated when service issues are preventing tenant administrators from accessing Service health in the Microsoft 365 admin center. Alternatively, customers can reference&nbsp;<a href=\"https://www.twitter.com/MSFT365Status\" target=\"_blank\">https://www.twitter.com/MSFT365Status</a>&nbsp;for additional insights into widespread, active incidents.</div>",
+          "published": "Sun, 15 Nov 2026 19:10:01 Z",
+          "severity": "info",
+          "link": "https://status.cloud.microsoft/"
+        }
+      ],
+      "checked_at": "2026-11-15T19:10:37.644112+00:00",
+      "source": "https://status.cloud.microsoft/api/feed/mac"
     }
   }
 }
