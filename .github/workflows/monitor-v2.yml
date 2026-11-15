@@ -2,8 +2,8 @@ name: Cloud Status Monitor
 
 on:
   schedule:
-    # Every 5 minutes, offset to :02/:07/... to avoid GitHub's top-of-hour load where scheduled runs get delayed or dropped; committing this file re-registers the schedule
-    - cron: '2-57/5 * * * *'
+    # Every 5 minutes, offset to :03/:08/... to avoid GitHub's top-of-hour load where scheduled runs get delayed or dropped; committing this file re-registers the schedule
+    - cron: '3-58/5 * * * *'
 
   workflow_dispatch:  # Allow manual runs
 
