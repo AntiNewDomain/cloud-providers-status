@@ -71,7 +71,7 @@
 <body>
   <div class="container">
     <h1>Cloud Providers Status</h1>
-    <p class="subtitle">Live status from official sources · Updated every 15 minutes</p>
+    <p class="subtitle">Live status from official sources · Provider checks every 5 minutes · Dashboard refreshes every minute</p>
 
     <div id="grid" class="grid">Loading…</div>
 
@@ -84,7 +84,7 @@
   <script>
     async function load() {
       try {
-        const res = await fetch('./status.json?t=' + Date.now());
+        const res = await fetch('./status.json?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
@@ -127,7 +127,12 @@
       }
     }
     load();
-    setInterval(load, 60000); // refresh every minute
+    setInterval(load, 60000); // Refresh dashboard data every minute.
+    // Refresh promptly when the visitor returns to the tab or window.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) load();
+    });
+    window.addEventListener('focus', load);
   </script>
 </body>
 </html>
