@@ -5,7 +5,7 @@ Checks official status pages for US-based cloud providers and sends a
 Discord alert ONLY on a massive outage (or when one clears).
 Writes status.json.
 
-Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud, GitHub,
+Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud,
 DigitalOcean, Oracle Cloud, plus Microsoft 365 Admin Center (limited —
 see below).
 
@@ -63,11 +63,6 @@ SOURCES = {
         "name": "Google Cloud",
         "url": "https://status.cloud.google.com/en/feed.atom",
         "type": "atom",
-    },
-    "github": {
-        "name": "GitHub",
-        "url": "https://www.githubstatus.com/api/v2/summary.json",
-        "type": "statuspage",
     },
     "digitalocean": {
         "name": "DigitalOcean",

@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T19:10:37.644147+00:00",
+  "updated_at": "2026-11-15T20:00:03.897053+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,7 +15,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-15T19:10:32.065821+00:00",
+      "checked_at": "2026-11-15T19:59:56.129550+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -32,7 +32,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-15T19:10:33.067879+00:00",
+      "checked_at": "2026-11-15T19:59:57.283108+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -41,7 +41,7 @@
       "status": "operational",
       "description": "Latest item from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-15T19:10:33.782591+00:00",
+      "checked_at": "2026-11-15T19:59:59.303501+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -58,18 +58,8 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-15T19:10:34.510747+00:00",
+      "checked_at": "2026-11-15T20:00:00.059813+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
-    },
-    "github": {
-      "provider": "github",
-      "name": "GitHub",
-      "status": "operational",
-      "description": "All Systems Operational",
-      "indicator": "none",
-      "incidents": [],
-      "checked_at": "2026-11-15T19:10:35.312103+00:00",
-      "source": "https://www.githubstatus.com/api/v2/summary.json"
     },
     "digitalocean": {
       "provider": "digitalocean",
@@ -78,7 +68,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-15T19:10:36.173154+00:00",
+      "checked_at": "2026-11-15T20:00:01.074441+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -88,7 +78,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-15T19:10:36.946143+00:00",
+      "checked_at": "2026-11-15T20:00:03.083883+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_admin_center": {
@@ -100,12 +90,12 @@
         {
           "title": "Microsoft Admin Center",
           "summary": "<div>This site is updated when service issues are preventing tenant administrators from accessing Service health in the Microsoft 365 admin center. Alternatively, customers can reference&nbsp;<a href=\"https://www.twitter.com/MSFT365Status\" target=\"_blank\">https://www.twitter.com/MSFT365Status</a>&nbsp;for additional insights into widespread, active incidents.</div>",
-          "published": "Sun, 15 Nov 2026 19:10:01 Z",
+          "published": "Sun, 15 Nov 2026 20:00:01 Z",
           "severity": "info",
           "link": "https://status.cloud.microsoft/"
         }
       ],
-      "checked_at": "2026-11-15T19:10:37.644112+00:00",
+      "checked_at": "2026-11-15T20:00:03.897022+00:00",
       "source": "https://status.cloud.microsoft/api/feed/mac"
     }
   }
