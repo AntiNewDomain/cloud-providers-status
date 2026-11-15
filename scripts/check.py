@@ -148,7 +148,9 @@ def fetch_rss_or_atom(key):
     # Only the NEWEST item decides the status, and only if it is recent
     # and unresolved. Old entries (e.g. Sep 15 AWS items still in the feed)
     # must not keep a provider stuck on outage after it resolved.
-    entries = feed.entries[:1]
+    # The last 3 items are still kept in "incidents" so the dashboard can
+    # show recent history — they do not affect the status.
+    entries = feed.entries[:3]
     active = []
     for entry in entries:
         title = entry.get("title", "")
@@ -190,7 +192,7 @@ def fetch_rss_or_atom(key):
         "provider": key,
         "name": info["name"],
         "status": overall,
-        "description": f"Latest item from official feed ({len(active)} recent)",
+        "description": f"Latest items from official feed ({len(active)} recent)",
         "incidents": active,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "source": info["url"],
