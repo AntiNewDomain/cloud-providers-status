@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-16T19:29:22.281212+00:00",
+  "updated_at": "2026-11-16T19:43:38.817667+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,7 +15,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-16T19:29:16.257932+00:00",
+      "checked_at": "2026-11-16T19:43:30.833452+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -46,7 +46,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-16T19:29:16.300603+00:00",
+      "checked_at": "2026-11-16T19:43:31.123730+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -55,7 +55,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.390655+00:00",
+      "checked_at": "2026-11-16T19:43:31.256164+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -72,7 +72,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-16T19:29:16.474255+00:00",
+      "checked_at": "2026-11-16T19:43:31.319913+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -82,7 +82,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.531652+00:00",
+      "checked_at": "2026-11-16T19:43:31.453228+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -92,7 +92,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.660745+00:00",
+      "checked_at": "2026-11-16T19:43:31.651103+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -101,7 +101,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.866405+00:00",
+      "checked_at": "2026-11-16T19:43:31.749207+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -111,7 +111,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.866405+00:00",
+      "checked_at": "2026-11-16T19:43:31.749207+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -121,7 +121,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.866405+00:00",
+      "checked_at": "2026-11-16T19:43:31.749207+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -131,7 +131,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-16T19:29:16.866405+00:00",
+      "checked_at": "2026-11-16T19:43:31.749207+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -139,16 +139,16 @@
       "provider": "microsoft_365_x",
       "name": "Microsoft 365 Status \u2014 X Updates",
       "account": "@MSFT365Status",
-      "status": "unavailable",
-      "retrieval_status": "unavailable",
+      "status": "ok",
+      "retrieval_status": "ok",
       "date_ct": "2026-11-16",
       "timezone": "America/Chicago",
       "posts": [],
       "today_count": 0,
-      "checked_at": "2026-11-16T19:29:22.279964+00:00",
-      "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50; https://nitter.mie.foundation/MSFT365Status/rss; https://nitter.mizuki.st/MSFT365Status/rss; https://hub.slarker.me/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1; https://rsshub.rssforever.com/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1; https://rsshub.app/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
+      "checked_at": "2026-11-16T19:43:31.749614+00:00",
+      "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
-      "description": "X feed retrieval failed; no claim is made that there were no posts. All public X feed mirrors failed: https://fxtwitter.com/MSFT365Status/feed.xml?count=50: 404 Client Error: Not Found for url: https://fxtwitter.com/MSFT365Status/feed.xml?count=50 | https://nitter.mie.foundation/MSFT365Status/rss: 429 Client Error: Too Many Requests for url: https://nitter.mie.found"
+      "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror."
     }
   }
 }
