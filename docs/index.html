@@ -78,6 +78,12 @@
       font-size: 0.85rem;
     }
     .incidents li { margin-bottom: 0.4rem; }
+    .x-updates-card { grid-column: 1 / -1; }
+    .x-updates-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .x-post { border-top: 1px solid #334155; padding-top: .9rem; margin-top: .9rem; }
+    .x-post-time { color: var(--muted); font-size: .78rem; margin-bottom: .35rem; }
+    .x-post-text { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
+    .x-feed-note { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
     footer {
       margin-top: 2.5rem;
       text-align: center;
@@ -101,7 +107,7 @@
     <div id="grid" class="grid">Loading…</div>
 
     <footer>
-      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API<br>
+      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API; Microsoft 365 Status X feed via third-party RSS mirror<br>
       <a href="https://github.com/AntiNewDomain/cloud-providers-status">View source on GitHub</a>
     </footer>
   </div>
@@ -160,6 +166,71 @@
           `;
             grid.appendChild(card);
           }
+        }
+
+        // Render today's actual @MSFT365Status posts separately from service health.
+        // All post text is inserted with textContent, never interpreted as HTML.
+        const xFeed = data.providers && data.providers.microsoft_365_x;
+        if (xFeed) {
+          const card = document.createElement('section');
+          card.className = 'card x-updates-card';
+          const header = document.createElement('div');
+          header.className = 'x-updates-header';
+          const heading = document.createElement('h2');
+          heading.textContent = 'Microsoft 365 Status — X Updates';
+          header.appendChild(heading);
+          const account = document.createElement('a');
+          account.href = xFeed.account_url || 'https://x.com/MSFT365Status';
+          account.target = '_blank';
+          account.rel = 'noopener noreferrer';
+          account.textContent = '@MSFT365Status';
+          header.appendChild(account);
+          card.appendChild(header);
+
+          const note = document.createElement('p');
+          note.className = 'x-feed-note';
+          note.textContent = 'Actual posts published today in Central Time · ' + (xFeed.date_ct || 'date unavailable');
+          card.appendChild(note);
+
+          if (xFeed.retrieval_status !== 'ok') {
+            const unavailable = document.createElement('p');
+            unavailable.className = 'x-feed-note';
+            unavailable.textContent = 'SOURCE UNAVAILABLE — X feed retrieval failed. No conclusion can be drawn about whether Microsoft posted today.';
+            card.appendChild(unavailable);
+          } else if (!Array.isArray(xFeed.posts) || xFeed.posts.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'x-feed-note';
+            empty.textContent = 'No posts from @MSFT365Status were returned for today (Central Time). Older posts are excluded.';
+            card.appendChild(empty);
+          } else {
+            for (const post of xFeed.posts) {
+              const item = document.createElement('article');
+              item.className = 'x-post';
+              const time = document.createElement('div');
+              time.className = 'x-post-time';
+              time.textContent = post.published_local || post.published_at || 'Publication time unavailable';
+              item.appendChild(time);
+              const body = document.createElement('p');
+              body.className = 'x-post-text';
+              body.textContent = post.text || '';
+              item.appendChild(body);
+              if (post.link && /^https:\/\//i.test(post.link)) {
+                const link = document.createElement('a');
+                link.href = post.link;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = 'View original post on X';
+                item.appendChild(link);
+              }
+              card.appendChild(item);
+            }
+          }
+
+          const checked = document.createElement('p');
+          checked.className = 'x-feed-note';
+          checked.textContent = 'Last retrieval: ' + (xFeed.checked_at ? new Date(xFeed.checked_at).toLocaleString() : 'Unknown') + ' · Feed: third-party RSS mirror';
+          card.appendChild(checked);
+          grid.appendChild(card);
         }
 
         lastUpdate = new Date(data.updated_at);
