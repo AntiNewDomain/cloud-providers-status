@@ -7,8 +7,8 @@ on:
       - 'scripts/check.py'
       - '.github/workflows/monitor-v2.yml'
   schedule:
-    # Low-frequency safety net only (GitHub cron is unreliable for frequent runs)
-    - cron: '17 */3 * * *'
+    # GitHub scheduled checks every 5 minutes; each run should finish quickly.
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
@@ -55,25 +55,3 @@ jobs:
             git push origin HEAD:main
             echo "Status files committed and pushed."
           fi
-
-      - name: Schedule next run in 4 minutes
-        if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          echo "Waiting 4 minutes before dispatching next run..."
-          sleep 240
-
-          echo "Dispatching next workflow run..."
-          curl --fail-with-body --silent --show-error \
-            --retry 3 --retry-all-errors --retry-delay 5 --max-time 30 \
-            -X POST \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches \
-            -d '{"ref":"main"}'
-
-          echo "Next run successfully dispatched."
