@@ -94,7 +94,7 @@
     <div id="grid" class="grid">Loading…</div>
 
     <footer>
-      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS, Azure and Microsoft 365 Admin Center RSS; Google Cloud Atom<br>
+      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API<br>
       <a href="https://github.com/AntiNewDomain/cloud-providers-status">View source on GitHub</a>
     </footer>
   </div>
@@ -107,7 +107,7 @@
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
 
-        const order = ['cloudflare', 'aws', 'azure', 'gcp', 'digitalocean', 'oracle', 'm365_admin_center'];
+        const order = ['cloudflare', 'aws', 'azure', 'gcp', 'digitalocean', 'oracle', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams'];
         for (const key of order) {
           const p = data.providers[key];
           if (!p) continue;
@@ -133,7 +133,7 @@
             </div>
             <div class="meta">${p.description || ''}</div>
             ${incidentsHtml}
-            <div class="meta" style="margin-top:0.75rem">Checked: ${new Date(p.checked_at).toLocaleString()}</div>
+            <div class="meta" style="margin-top:0.75rem">Checked: ${p.checked_at ? new Date(p.checked_at).toLocaleString() : 'Awaiting first check'}</div>
           `;
           grid.appendChild(card);
         }
