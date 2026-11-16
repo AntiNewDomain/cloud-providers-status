@@ -2,14 +2,15 @@ name: Cloud Status Monitor
 
 on:
   schedule:
-    # Run at five-minute UTC boundaries. GitHub scheduling is best-effort.
-    - cron: '*/5 * * * *'
+    # Five-minute fallback schedule. GitHub scheduling is best-effort.
+    - cron: '3-58/5 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write
 
-# Prevent overlapping scheduled and manually triggered checks.
+# Prevent the cron fallback and self-dispatch chain from running concurrently.
 concurrency:
   group: cloud-status-monitor
   cancel-in-progress: false
@@ -55,3 +56,28 @@ jobs:
             git push origin HEAD:main
             echo "Status files committed and pushed to main."
           fi
+
+      - name: Schedule next run
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          sleep 300
+
+          if [[ -z "${GITHUB_TOKEN}" ]]; then
+            echo "::error::GITHUB_TOKEN is unavailable; cannot dispatch the next run."
+            exit 1
+          fi
+
+          # --fail-with-body ensures HTTP 4xx/5xx responses fail the step;
+          # retries cover transient API/network failures.
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-all-errors --retry-delay 5 --max-time 30 \
+            -X POST \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches \
+            -d '{"ref":"main"}'
+
+          echo "Next workflow run successfully dispatched."
