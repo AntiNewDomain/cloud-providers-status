@@ -52,7 +52,7 @@ jobs:
             echo "Status files committed and pushed."
           fi
 
-      - name: Schedule next run in 5 minutes
+      - name: Schedule next run in 4 minutes
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
