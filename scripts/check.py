@@ -7,7 +7,8 @@ Writes status.json.
 
 Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud,
 DigitalOcean, Oracle Cloud, plus Microsoft's public Microsoft 365 consumer
-service-health API (including Copilot, Outlook.com, and Teams Free).
+service-health API (including Copilot, Outlook.com, and Teams Free). Today's
+@MSFT365Status posts are retrieved separately through a third-party RSS mirror.
 
 Fixes vs the original version:
 - Feed providers (AWS/Azure/GCP) used to flag "outage" forever: they took
@@ -44,7 +45,7 @@ from zoneinfo import ZoneInfo
 import requests
 import feedparser
 
-# Official sources only
+# Provider status sources; Microsoft 365 X posts use a separate third-party feed mirror.
 SOURCES = {
     "cloudflare": {
         "name": "Cloudflare",
