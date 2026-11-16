@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   check-status:
@@ -38,3 +39,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add status.json docs/status.json || true
           git diff --staged --quiet || (git commit -m "Update cloud status $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
+
+      - name: Schedule next run
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+      sleep 300
+      curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches -d '{"ref":"main"}'
+      
