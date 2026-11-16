@@ -124,29 +124,22 @@
 
         document.querySelector('.subtitle').textContent =
           `Live status from official sources · Last update: ${new Date(data.updated_at).toLocaleString()}`;
+        lastUpdate = new Date(data.updated_at);
       } catch (e) {
         document.getElementById('grid').textContent = 'Failed to load status.json';
       }
     }
 
-    // Countdown to the next scheduled provider check.
-    // The workflow runs every 5 minutes at :02, :07, :12, ... (minutes are the same in every timezone).
-    const TICK_MINUTES = [2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57];
-    function nextTick(from) {
-      const d = new Date(from);
-      d.setSeconds(0, 0);
-      for (const m of TICK_MINUTES) {
-        if (m > from.getMinutes()) { d.setMinutes(m); return d; }
-      }
-      d.setDate(d.getDate() + 1);
-      d.setHours(0, 2, 0, 0);
-      return d;
-    }
+    // Countdown to the next provider check. The workflow re-triggers itself
+    // about 5 minutes after each run, so the next update is the last update
+    // (status.json's updated_at) plus 5 minutes.
+    let lastUpdate = null;
     function tickCountdown() {
       const el = document.getElementById('countdown');
       if (!el) return;
+      if (!lastUpdate) return;
+      const next = new Date(lastUpdate.getTime() + 5 * 60 * 1000);
       const now = new Date();
-      const next = nextTick(now);
       const secs = Math.max(0, Math.round((next - now) / 1000));
       if (secs === 0) { el.textContent = 'Updating…'; return; }
       const m = Math.floor(secs / 60);
