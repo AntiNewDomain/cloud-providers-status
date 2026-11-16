@@ -74,12 +74,9 @@ SOURCES = {
         "url": "https://ocistatus.oraclecloud.com/api/v2/status.json",
         "type": "statuspage",
     },
-    "m365_admin_center": {
-        "name": "Microsoft 365 Admin Center",
-        "url": "https://status.cloud.microsoft/api/feed/mac",
-        "type": "rss",
-    },
 }
+
+MICROSOFT_CONSUMER_URL = "https://status.cloud.microsoft/api/posts/m365Consumer"
 
 RECENT = timedelta(hours=12)
 STATUS_FILE = Path("status.json")
@@ -198,18 +195,102 @@ def fetch_rss_or_atom(key):
         "source": info["url"],
     }
 
-    # Microsoft 365 Admin Center feed: it reports only whether the Admin
-    # Center itself is Available. It is NOT Outlook/Teams health and must
-    # never trigger a massive-outage alert on its own.
-    if key == "m365_admin_center":
-        result["status"] = "operational" if overall != "outage" else "degraded"
-        result["description"] = (
-            "Admin Center availability only — this feed does NOT cover "
-            "Outlook/Teams/Exchange Online incidents."
-        )
-
     return result
 
+
+
+def _microsoft_status(value):
+    """Normalize Microsoft's public consumer-status labels."""
+    value = str(value or "").strip().lower()
+    if any(word in value for word in ("outage", "down", "unavailable")):
+        return "outage"
+    if any(word in value for word in ("degrad", "partial", "intermittent", "disruption")):
+        return "degraded"
+    if any(word in value for word in ("operational", "normal", "available", "healthy")):
+        return "operational"
+    return "unknown"
+
+
+def fetch_microsoft_consumer():
+    """Read Microsoft's public consumer service-health API (no tenant login)."""
+    response = requests.get(MICROSOFT_CONSUMER_URL, timeout=20)
+    response.raise_for_status()
+    payload = response.json()
+    if isinstance(payload, dict):
+        for key in ("value", "data", "posts", "items"):
+            if isinstance(payload.get(key), list):
+                payload = payload[key]
+                break
+    if not isinstance(payload, list):
+        raise ValueError("Unexpected Microsoft consumer status API response format")
+    records = [item for item in payload if isinstance(item, dict)]
+    if not records:
+        raise ValueError("Microsoft consumer status API returned no service records")
+
+    def display(item):
+        return str(item.get("ServiceDisplayName") or "").strip().lower()
+
+    def workload(item):
+        return str(item.get("ServiceWorkloadName") or "").strip().lower()
+
+    specs = {
+        "m365_consumer": ("Microsoft 365 (Consumer)", lambda x:
+            "microsoft 365 (consumer)" in display(x)
+            or "microsoft 365 consumer" in display(x)
+            or workload(x) in ("m365consumer", "microsoft365consumer")),
+        "m365_copilot": ("Microsoft Copilot", lambda x:
+            "copilot" in display(x) or "copilot" in workload(x)),
+        "outlook_com": ("Outlook.com", lambda x:
+            "outlook.com" in display(x) or "outlookconsumer" in workload(x)
+            or workload(x) == "outlook"),
+        "microsoft_teams": ("Microsoft Teams (Consumer / Free)", lambda x:
+            ("teams" in display(x) and any(t in display(x) for t in ("free", "consumer", "personal")))
+            or any(t in workload(x) for t in ("teamsfree", "teamsconsumer"))),
+    }
+
+    def updated(item):
+        return _parse_date(item.get("LastUpdatedTime") or "") or datetime.min.replace(tzinfo=timezone.utc)
+
+    now = datetime.now(timezone.utc).isoformat()
+    output = {}
+    for key, (name, matches) in specs.items():
+        matched = sorted([x for x in records if matches(x)], key=updated, reverse=True)
+        if key == "m365_consumer":
+            statuses = [_microsoft_status(x.get("Status")) for x in records]
+            known = [s for s in statuses if s != "unknown"]
+            status = ("outage" if "outage" in known else
+                      "degraded" if "degraded" in known else
+                      "operational" if known else "unknown")
+            affected = [x for x in records if _microsoft_status(x.get("Status")) in ("outage", "degraded")]
+        elif matched:
+            status = _microsoft_status(matched[0].get("Status"))
+            affected = [x for x in matched if _microsoft_status(x.get("Status")) in ("outage", "degraded")]
+        else:
+            status, affected = "unknown", []
+
+        incidents = [{
+            "name": x.get("Title") or x.get("ServiceDisplayName") or name,
+            "summary": (x.get("Message") or "")[:600],
+            "status": x.get("Status"),
+            "updated": x.get("LastUpdatedTime"),
+        } for x in affected[:5]]
+
+        if key != "m365_consumer" and not matched:
+            description = "No separate component record was returned by Microsoft's public consumer status API."
+        elif status == "unknown":
+            description = "Microsoft returned an unrecognized or unavailable status value."
+        elif status in ("degraded", "outage"):
+            description = f"Microsoft's official consumer status reports {status}."
+        else:
+            description = "Microsoft's official consumer status reports this service operational."
+
+        output[key] = {
+            "provider": key, "name": name, "status": status,
+            "description": description, "incidents": incidents,
+            "checked_at": now, "source": MICROSOFT_CONSUMER_URL,
+            "status_page": "https://status.cloud.microsoft/",
+        }
+    return output
 
 def load_previous():
     if STATUS_FILE.exists():
@@ -264,12 +345,30 @@ def main():
                 "checked_at": datetime.now(timezone.utc).isoformat(),
             }
 
+    try:
+        results.update(fetch_microsoft_consumer())
+    except Exception as e:
+        for key, name in (
+            ("m365_consumer", "Microsoft 365 (Consumer)"),
+            ("m365_copilot", "Microsoft Copilot"),
+            ("outlook_com", "Outlook.com"),
+            ("microsoft_teams", "Microsoft Teams (Consumer / Free)"),
+        ):
+            results[key] = {
+                "provider": key, "name": name, "status": "error",
+                "description": f"Microsoft consumer status API check failed: {e}",
+                "incidents": [], "checked_at": datetime.now(timezone.utc).isoformat(),
+                "source": MICROSOFT_CONSUMER_URL,
+            }
+
     # Detect massive-outage transitions only (not every status change).
     prev_providers = previous.get("providers", {}) if isinstance(previous, dict) else {}
     new_massive = []
     cleared_massive = []
     for key, current in results.items():
         prev = prev_providers.get(key, {})
+        if key in ("m365_copilot", "outlook_com", "microsoft_teams"):
+            continue
         was_massive = prev.get("status") == "outage" and key != "m365_admin_center"
         now_massive = is_massive(current)
         if now_massive and not was_massive:
