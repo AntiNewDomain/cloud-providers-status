@@ -7,8 +7,9 @@ on:
       - 'scripts/check.py'
       - '.github/workflows/monitor-v2.yml'
   schedule:
-    # GitHub-hosted schedules are best-effort, not an exact five-minute SLA.
-    - cron: '*/5 * * * *'
+    # GitHub-hosted schedules are best-effort. */5 is frequently delayed/skipped;
+    # */15 is far more reliable for free/public runners.
+    - cron: '*/15 * * * *'
 
 permissions:
   contents: write
