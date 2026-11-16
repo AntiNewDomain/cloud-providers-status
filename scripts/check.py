@@ -83,10 +83,11 @@ MICROSOFT_CONSUMER_URL = "https://status.cloud.microsoft/api/posts/m365Consumer"
 
 # Public X timeline mirror. This is a third-party dependency, not an official X API.
 # If the feed cannot be retrieved, the dashboard reports source unavailable.
-MICROSOFT_365_X_FEED_URL = (
-    "https://rsshub.rssforever.com/twitter/user/MSFT365Status"
-    "?count=30&includeReplies=0&includeRts=0&forceWebApi=1"
-)
+MICROSOFT_365_X_FEED_URLS = [
+    "https://hub.slarker.me/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
+    "https://rsshub.rssforever.com/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
+    "https://rsshub.app/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
+]
 CENTRAL_TZ = ZoneInfo("America/Chicago")
 
 
@@ -120,22 +121,33 @@ def fetch_microsoft_365_x_posts():
         "posts": [],
         "today_count": 0,
         "checked_at": checked_at,
-        "source": MICROSOFT_365_X_FEED_URL,
+        "source": None,
         "account_url": "https://x.com/MSFT365Status",
         "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
     }
 
-    response = requests.get(
-        MICROSOFT_365_X_FEED_URL,
-        headers={"User-Agent": "CloudProvidersStatusMonitor/1.0"},
-        timeout=25,
-    )
-    response.raise_for_status()
-    feed = feedparser.parse(response.content)
-    if getattr(feed, "bozo", False) and not feed.entries:
-        raise ValueError(f"X feed returned invalid RSS: {feed.bozo_exception}")
-    if not getattr(feed, "version", "") and not feed.entries:
-        raise ValueError("X feed did not return a recognizable RSS/Atom document")
+    feed = None
+    feed_errors = []
+    for feed_url in MICROSOFT_365_X_FEED_URLS:
+        try:
+            response = requests.get(
+                feed_url,
+                headers={"User-Agent": "CloudProvidersStatusMonitor/1.0"},
+                timeout=25,
+            )
+            response.raise_for_status()
+            candidate = feedparser.parse(response.content)
+            if getattr(candidate, "bozo", False) and not candidate.entries:
+                raise ValueError(f"invalid RSS: {candidate.bozo_exception}")
+            if not getattr(candidate, "version", "") and not candidate.entries:
+                raise ValueError("response was not a recognizable RSS/Atom feed")
+            feed = candidate
+            result["source"] = feed_url
+            break
+        except Exception as error:
+            feed_errors.append(f"{feed_url}: {error}")
+    if feed is None:
+        raise RuntimeError("All public X feed mirrors failed: " + " | ".join(feed_errors))
 
     seen = set()
     posts = []
@@ -188,7 +200,7 @@ def microsoft_365_x_unavailable(error):
         "posts": [],
         "today_count": 0,
         "checked_at": checked_at,
-        "source": MICROSOFT_365_X_FEED_URL,
+        "source": "; ".join(MICROSOFT_365_X_FEED_URLS),
         "account_url": "https://x.com/MSFT365Status",
         "description": f"X feed retrieval failed; no claim is made that there were no posts. {str(error)[:300]}",
     }
