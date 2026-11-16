@@ -59,8 +59,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Waiting 5 minutes before dispatching next run..."
-          sleep 300
+          echo "Waiting 4 minutes before dispatching next run..."
+          sleep 240
 
           echo "Dispatching next workflow run..."
           curl --fail-with-body --silent --show-error \
