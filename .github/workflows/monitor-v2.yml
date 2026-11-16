@@ -1,16 +1,15 @@
 name: Cloud Status Monitor
 
 on:
-  schedule:
-    # Five-minute fallback schedule. GitHub scheduling is best-effort.
-    - cron: '3-58/5 * * * *'
   workflow_dispatch:
+  schedule:
+    # Low-frequency safety net only (GitHub cron is unreliable for frequent runs)
+    - cron: '17 */3 * * *'
 
 permissions:
   contents: write
   actions: write
 
-# Prevent the cron fallback and self-dispatch chain from running concurrently.
 concurrency:
   group: cloud-status-monitor
   cancel-in-progress: false
@@ -18,7 +17,7 @@ concurrency:
 jobs:
   check-status:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,28 +49,27 @@ jobs:
           else
             git commit -m "Update cloud status $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push origin HEAD:main
-            echo "Status files committed and pushed to main."
+            echo "Status files committed and pushed."
           fi
 
-      - name: Schedule next run
+      - name: Schedule next run in 5 minutes
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+
+          echo "Waiting 5 minutes before dispatching next run..."
           sleep 300
 
-          if [[ -z "${GITHUB_TOKEN}" ]]; then
-            echo "::error::GITHUB_TOKEN is unavailable; cannot dispatch the next run."
-            exit 1
-          fi
-
+          echo "Dispatching next workflow run..."
           curl --fail-with-body --silent --show-error \
             --retry 3 --retry-all-errors --retry-delay 5 --max-time 30 \
             -X POST \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches \
             -d '{"ref":"main"}'
 
-          echo "Next workflow run successfully dispatched."
+          echo "Next run successfully dispatched."
