@@ -44,7 +44,6 @@ jobs:
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-      sleep 300
-      curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches -d '{"ref":"main"}'
-      
+        run: |
+          sleep 300
+          curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches -d '{"ref":"main"}'
