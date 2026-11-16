@@ -7,9 +7,9 @@ on:
       - 'scripts/check.py'
       - '.github/workflows/monitor-v2.yml'
   schedule:
-    # GitHub-hosted schedules are best-effort. */5 is frequently delayed/skipped;
-    # */15 is far more reliable for free/public runners.
-    - cron: '*/15 * * * *'
+    # Staggered every ~15 minutes, offset from the heavy :00/:15/:30/:45 slots.
+    # GitHub schedule is best-effort; avoiding top-of-hour congestion improves reliability.
+    - cron: '7,22,37,52 * * * *'
 
 permissions:
   contents: write
