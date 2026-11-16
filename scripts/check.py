@@ -81,9 +81,14 @@ SOURCES = {
 
 MICROSOFT_CONSUMER_URL = "https://status.cloud.microsoft/api/posts/m365Consumer"
 
-# Public X timeline mirror. This is a third-party dependency, not an official X API.
-# If the feed cannot be retrieved, the dashboard reports source unavailable.
+# Free public X timeline sources, ordered by preference.
+# FxEmbed documents RSS feeds for public X profiles. Nitter instances and
+# RSSHub mirrors are independent fallbacks; all are third-party and may fail.
+# Do not treat an unreachable source as evidence that no posts were published.
 MICROSOFT_365_X_FEED_URLS = [
+    "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
+    "https://nitter.mie.foundation/MSFT365Status/rss",
+    "https://nitter.mizuki.st/MSFT365Status/rss",
     "https://hub.slarker.me/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
     "https://rsshub.rssforever.com/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
     "https://rsshub.app/twitter/user/MSFT365Status?count=30&includeReplies=0&includeRts=0&forceWebApi=1",
@@ -133,14 +138,16 @@ def fetch_microsoft_365_x_posts():
             response = requests.get(
                 feed_url,
                 headers={"User-Agent": "CloudProvidersStatusMonitor/1.0"},
-                timeout=25,
+                timeout=12,
             )
             response.raise_for_status()
             candidate = feedparser.parse(response.content)
             if getattr(candidate, "bozo", False) and not candidate.entries:
                 raise ValueError(f"invalid RSS: {candidate.bozo_exception}")
-            if not getattr(candidate, "version", "") and not candidate.entries:
+            if not getattr(candidate, "version", ""):
                 raise ValueError("response was not a recognizable RSS/Atom feed")
+            # A valid feed with zero entries is still a successful retrieval;
+            # only then may the dashboard accurately say no posts were found.
             feed = candidate
             result["source"] = feed_url
             break
