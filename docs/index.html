@@ -81,7 +81,7 @@
     .x-updates-card { grid-column: 1 / -1; }
     .x-updates-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .x-post { border-top: 1px solid #334155; padding-top: .9rem; margin-top: .9rem; }
-    .x-post-time { color: var(--muted); font-size: .78rem; margin-bottom: .35rem; }
+    .x-post-time { color: var(--muted); font-size: .78rem; }
     .x-post-text { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
     .x-feed-note { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
     footer {
@@ -100,7 +100,7 @@
     <section class="monitor-panel" aria-live="polite">
       <div class="monitor-label">NEXT EXPECTED CHECK</div>
       <div class="countdown" id="countdown">Waiting for monitor data…</div>
-      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a 15-minute schedule.</div>
+      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a staggered 15-minute schedule.</div>
       <div class="monitor-meta" id="last-check" style="margin-top:.5rem">Last monitor update: Loading…</div>
     </section>
 
@@ -168,8 +168,6 @@
           }
         }
 
-        // Render today's actual @MSFT365Status posts separately from service health.
-        // All post text is inserted with textContent, never interpreted as HTML.
         const xFeed = data.providers && data.providers.microsoft_365_x;
         if (xFeed) {
           const card = document.createElement('section');
@@ -244,9 +242,6 @@
       }
     }
 
-    // Count down to the 15-minute expected interval after the last
-    // monitor data update. GitHub queue/startup time is additional: zero means
-    // dispatch is due, not that a run has started or succeeded.
     let lastUpdate = null;
     function tickCountdown() {
       const el = document.getElementById('countdown');
@@ -287,8 +282,7 @@
     setInterval(tickCountdown, 1000);
 
     load();
-    setInterval(load, 60000); // Refresh dashboard data every minute.
-    // Refresh promptly when the visitor returns to the tab or window.
+    setInterval(load, 60000);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) load();
     });
