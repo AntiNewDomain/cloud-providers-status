@@ -2,18 +2,23 @@ name: Cloud Status Monitor
 
 on:
   schedule:
-    # Every 5 minutes, offset to :03/:08/... to avoid GitHub's top-of-hour load where scheduled runs get delayed or dropped; committing this file re-registers the schedule
+    # Five-minute fallback schedule. GitHub scheduling is best-effort.
     - cron: '3-58/5 * * * *'
-
-  workflow_dispatch:  # Allow manual runs
+  workflow_dispatch:
 
 permissions:
   contents: write
   actions: write
 
+# Prevent the cron fallback and self-dispatch chain from running concurrently.
+concurrency:
+  group: cloud-status-monitor
+  cancel-in-progress: false
+
 jobs:
   check-status:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,6 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           pip install requests feedparser
 
@@ -35,15 +41,43 @@ jobs:
 
       - name: Commit and push status update
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add status.json docs/status.json || true
-          git diff --staged --quiet || (git commit -m "Update cloud status $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
+
+          # Do not hide staging failures: a green workflow must mean the files
+          # were staged successfully and the push either happened or was unnecessary.
+          git add -- status.json docs/status.json
+
+          if git diff --cached --quiet; then
+            echo "No status-file changes to commit."
+          else
+            git commit -m "Update cloud status $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push origin HEAD:main
+            echo "Status files committed and pushed to main."
+          fi
 
       - name: Schedule next run
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           sleep 300
-          curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches -d '{"ref":"main"}'
+
+          if [[ -z "${GITHUB_TOKEN}" ]]; then
+            echo "::error::GITHUB_TOKEN is unavailable; cannot dispatch the next run."
+            exit 1
+          fi
+
+          # --fail-with-body ensures HTTP 4xx/5xx responses fail the step;
+          # retries cover transient API/network failures.
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-all-errors --retry-delay 5 --max-time 30 \
+            -X POST \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/AntiNewDomain/cloud-providers-status/actions/workflows/monitor-v2.yml/dispatches \
+            -d '{"ref":"main"}'
+
+          echo "Next workflow run successfully dispatched."
