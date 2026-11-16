@@ -20,7 +20,7 @@ Only official public sources are used. No third-party status aggregators. No Chi
 
 ## Features
 
-- Checks every **5 minutes** automatically
+- Checks every **15 minutes** automatically
 - Live dashboard on GitHub Pages
 - Detects status changes
 - Optional Discord alerts for massive outages only (plus one message when a massive outage clears)
@@ -52,7 +52,7 @@ You can trigger a check immediately:
 
 ## Files
 
-- `.github/workflows/monitor.yml` — scheduled workflow
+- `.github/workflows/monitor-v2.yml` — scheduled workflow
 - `scripts/check.py` — status checker script
 - `docs/` — dashboard (GitHub Pages)
 - `status.json` — latest status data
@@ -65,4 +65,4 @@ You can trigger a check immediately:
 - Microsoft 365 / Outlook / Teams limitation: Microsoft publishes no anonymous public incident feed for Microsoft 365. The feed listed above reports only whether the Microsoft 365 Admin Center itself is Available; it did not list the Nov 12–14, 2026 Outlook/Teams outage (MO1550821 / EX1550543), and it never triggers a massive-outage alert. Full Microsoft 365 service health needs a tenant login.
 - Fastly is intentionally excluded: its status API returns HTTP 403 from GitHub Actions-style runners.
 - GitHub Actions scheduled runs are best-effort and can lag; the dashboard timestamp shows the last completed run.
-- The check interval can be changed in the workflow file if needed.
+- The schedule is set to every 15 minutes for reliability (5-minute schedules are frequently delayed or skipped by GitHub).
