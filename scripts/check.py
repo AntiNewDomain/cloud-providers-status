@@ -19,14 +19,14 @@ Fixes vs the original version:
   Now it alerts only when a provider becomes massive, plus one message
   when a massive outage clears. Minor/degraded changes do not alert.
 
-Microsoft 365 / Outlook / Teams limitation:
-Microsoft publishes NO anonymous public incident feed for Microsoft 365.
-The only public RSS (status.cloud.microsoft/api/feed/mac) reports whether
-the Microsoft 365 Admin Center itself is Available — it did NOT list the
-Nov 12-14, 2026 Outlook/Teams outage (MO1550821 / EX1550543). It is
-included here as "m365_admin_center" for what it is, and it NEVER counts
-as massive on its own. Full Microsoft 365 service health needs a tenant
-login (Microsoft Graph ServiceHealth.Read.All).
+Microsoft consumer monitoring:
+The public status page exposes consumer workload data through
+https://status.cloud.microsoft/api/posts/m365Consumer. This monitor uses
+that official endpoint for Microsoft 365 (Consumer), Copilot, Outlook.com,
+and Microsoft Teams Free. The aggregate consumer card reports the worst
+status across returned consumer workloads; product cards use their own
+workload records. This is separate from tenant-specific Microsoft 365
+business health, which still requires an administrator sign-in.
 
 Fastly is intentionally excluded: its status API returns HTTP 403 from
 GitHub Actions-style runners, so it cannot be checked reliably.
