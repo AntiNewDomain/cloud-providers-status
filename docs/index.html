@@ -26,7 +26,18 @@
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
     .subtitle { color: var(--muted); margin-bottom: 0.5rem; font-size: 0.95rem; }
-    .countdown { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+    .monitor-panel {
+      background: var(--card);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin: 1rem 0 2rem;
+    }
+    .monitor-label { color: var(--muted); font-size: 0.78rem; font-weight: 700; letter-spacing: .06em; }
+    .countdown { color: var(--green); font-size: clamp(2rem, 7vw, 3rem); line-height: 1.15; font-weight: 750; font-variant-numeric: tabular-nums; margin: .25rem 0; }
+    .countdown.waiting { color: var(--yellow); font-size: 1.15rem; }
+    .countdown.delayed { color: var(--red); font-size: 1.25rem; }
+    .monitor-meta { color: var(--muted); font-size: .85rem; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -73,7 +84,12 @@
   <div class="container">
     <h1>Cloud Providers Status</h1>
     <p class="subtitle">Live status from official sources · Provider checks every 5 minutes · Dashboard refreshes every minute</p>
-    <p class="countdown" id="countdown">Next update in …</p>
+    <section class="monitor-panel" aria-live="polite">
+      <div class="monitor-label">NEXT EXPECTED CHECK</div>
+      <div class="countdown" id="countdown">Waiting for monitor data…</div>
+      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a five-minute schedule.</div>
+      <div class="monitor-meta" id="last-check" style="margin-top:.5rem">Last monitor update: Loading…</div>
+    </section>
 
     <div id="grid" class="grid">Loading…</div>
 
@@ -122,29 +138,55 @@
           grid.appendChild(card);
         }
 
-        document.querySelector('.subtitle').textContent =
-          `Live status from official sources · Last update: ${new Date(data.updated_at).toLocaleString()}`;
         lastUpdate = new Date(data.updated_at);
+        document.querySelector('.subtitle').textContent =
+          'Live status from official sources · Checks scheduled every 5 minutes';
+        document.getElementById('last-check').textContent =
+          'Last monitor data update: ' + (Number.isNaN(lastUpdate.getTime()) ? 'Unknown' : lastUpdate.toLocaleString());
+        tickCountdown();
       } catch (e) {
         document.getElementById('grid').textContent = 'Failed to load status.json';
       }
     }
 
-    // Countdown to the next provider check. The workflow re-triggers itself
-    // about 5 minutes after each run, so the next update is the last update
-    // (status.json's updated_at) plus 5 minutes.
+    // Count down to the next five-minute cron boundary after the last
+    // monitor data update. GitHub scheduling is best-effort: zero means due,
+    // not that a run has started or succeeded.
     let lastUpdate = null;
     function tickCountdown() {
       const el = document.getElementById('countdown');
-      if (!el) return;
-      if (!lastUpdate) return;
-      const next = new Date(lastUpdate.getTime() + 5 * 60 * 1000);
-      const now = new Date();
-      const secs = Math.max(0, Math.round((next - now) / 1000));
-      if (secs === 0) { el.textContent = 'Updating…'; return; }
-      const m = Math.floor(secs / 60);
-      const s = String(secs % 60).padStart(2, '0');
-      el.textContent = `Next update in ${m}:${s}`;
+      const detail = document.getElementById('countdown-detail');
+      if (!el || !detail) return;
+      if (!lastUpdate || Number.isNaN(lastUpdate.getTime())) {
+        el.className = 'countdown waiting';
+        el.textContent = 'Waiting for monitor data…';
+        detail.textContent = 'No valid monitor timestamp is available yet.';
+        return;
+      }
+
+      const interval = 5 * 60 * 1000;
+      const expected = (Math.floor(lastUpdate.getTime() / interval) + 1) * interval;
+      const now = Date.now();
+      const remaining = expected - now;
+      const overdue = now - expected;
+
+      if (remaining > 0) {
+        const secs = Math.ceil(remaining / 1000);
+        const mins = Math.floor(secs / 60);
+        const seconds = String(secs % 60).padStart(2, '0');
+        el.className = 'countdown';
+        el.textContent = `${mins}:${seconds}`;
+        detail.textContent = 'Until the next expected five-minute check · GitHub may start late.';
+      } else if (overdue <= 2 * 60 * 1000) {
+        el.className = 'countdown waiting';
+        el.textContent = 'Check due — waiting for GitHub Actions';
+        detail.textContent = 'The scheduled time has arrived. Waiting for new monitor data.';
+      } else {
+        const lateMins = Math.floor(overdue / 60000);
+        el.className = 'countdown delayed';
+        el.textContent = 'DELAYED';
+        detail.textContent = `No new monitor data ${lateMins} minute(s) after the expected check. Showing the last recorded results.`;
+      }
     }
     tickCountdown();
     setInterval(tickCountdown, 1000);
