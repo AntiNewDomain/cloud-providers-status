@@ -173,7 +173,7 @@
       }
     }
 
-    // Count down to the 4-minute-10-second expected interval after the last
+    // Count down to the 5-minute expected interval after the last
     // monitor data update. GitHub queue/startup time is additional: zero means
     // dispatch is due, not that a run has started or succeeded.
     let lastUpdate = null;
@@ -188,7 +188,7 @@
         return;
       }
 
-      const interval = 4 * 60 * 1000 + 10 * 1000;
+      const interval = 5 * 60 * 1000;
       const expected = lastUpdate.getTime() + interval;
       const now = Date.now();
       const remaining = expected - now;
@@ -204,7 +204,7 @@
       } else if (overdue <= 2 * 60 * 1000) {
         el.className = 'countdown waiting';
         el.textContent = 'Check due — waiting for GitHub Actions';
-        detail.textContent = 'The 4:10 countdown has elapsed. Waiting for GitHub Actions to start and publish new data.';
+        detail.textContent = 'The 5:00 countdown has elapsed. Waiting for GitHub Actions to start and publish new data.';
       } else {
         const lateMins = Math.floor(overdue / 60000);
         el.className = 'countdown delayed';
