@@ -7,13 +7,13 @@ on:
       - 'scripts/check.py'
       - '.github/workflows/monitor-v2.yml'
   schedule:
-    # GitHub scheduled checks every 5 minutes; each run should finish quickly.
+    # GitHub-hosted schedules are best-effort, not an exact five-minute SLA.
     - cron: '*/5 * * * *'
 
 permissions:
   contents: write
-  actions: write
 
+# Serialize monitor runs. Never let an older run overwrite a newer result.
 concurrency:
   group: cloud-status-monitor
   cancel-in-progress: false
@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,16 +45,42 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python scripts/check.py
 
-      - name: Commit and push status update
+      - name: Publish status safely
+        shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -- status.json docs/status.json
-          if git diff --cached --quiet; then
-            echo "No status-file changes to commit."
-          else
+
+          # Preserve this run's fresh results outside the worktree. Rebase-style
+          # recovery is done by rebuilding the commit on the latest main, rather
+          # than attempting to merge two generated JSON snapshots.
+          snapshot="$(mktemp -d)"
+          cp status.json "$snapshot/status.json"
+          cp docs/status.json "$snapshot/docs-status.json"
+
+          for attempt in 1 2 3; do
+            echo "Publish attempt $attempt/3: syncing with origin/main"
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$snapshot/status.json" status.json
+            cp "$snapshot/docs-status.json" docs/status.json
+            git add -- status.json docs/status.json
+
+            if git diff --cached --quiet; then
+              echo "Status files already match the published data."
+              exit 0
+            fi
+
             git commit -m "Update cloud status $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push origin HEAD:main
-            echo "Status files committed and pushed."
-          fi
+            if git push origin HEAD:main; then
+              echo "Status files published successfully."
+              exit 0
+            fi
+
+            echo "Push raced with another main-branch update; retrying from latest main."
+            sleep 2
+          done
+
+          echo "::error::Could not publish status after three attempts."
+          exit 1
