@@ -323,8 +323,6 @@ def send_discord(webhook, message):
 
 def is_massive(result):
     """Massive = a major/critical outage, not minor/degraded."""
-    if result["provider"] == "m365_admin_center":
-        return False
     return result.get("status") == "outage"
 
 
@@ -371,7 +369,7 @@ def main():
         prev = prev_providers.get(key, {})
         if key in ("m365_copilot", "outlook_com", "microsoft_teams"):
             continue
-        was_massive = prev.get("status") == "outage" and key != "m365_admin_center"
+        was_massive = prev.get("status") == "outage"
         now_massive = is_massive(current)
         if now_massive and not was_massive:
             new_massive.append(current)
