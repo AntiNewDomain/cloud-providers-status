@@ -2,6 +2,10 @@ name: Cloud Status Monitor
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/check.py'
+      - '.github/workflows/monitor-v2.yml'
   schedule:
     # Low-frequency safety net only (GitHub cron is unreliable for frequent runs)
     - cron: '17 */3 * * *'
