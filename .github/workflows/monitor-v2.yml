@@ -6,10 +6,6 @@ on:
     paths:
       - 'scripts/check.py'
       - '.github/workflows/monitor-v2.yml'
-  schedule:
-    # Staggered every ~15 minutes, offset from the heavy :00/:15/:30/:45 slots.
-    # GitHub schedule is best-effort; avoiding top-of-hour congestion improves reliability.
-    - cron: '7,22,37,52 * * * *'
 
 permissions:
   contents: write
