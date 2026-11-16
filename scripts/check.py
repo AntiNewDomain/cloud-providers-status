@@ -38,6 +38,8 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from email.utils import parsedate_to_datetime
+from html.parser import HTMLParser
+from zoneinfo import ZoneInfo
 
 import requests
 import feedparser
@@ -77,6 +79,119 @@ SOURCES = {
 }
 
 MICROSOFT_CONSUMER_URL = "https://status.cloud.microsoft/api/posts/m365Consumer"
+
+# Public X timeline mirror. This is a third-party dependency, not an official X API.
+# If the feed cannot be retrieved, the dashboard reports source unavailable.
+MICROSOFT_365_X_FEED_URL = (
+    "https://rsshub.rssforever.com/twitter/user/MSFT365Status"
+    "?count=30&includeReplies=0&includeRts=0&forceWebApi=1"
+)
+CENTRAL_TZ = ZoneInfo("America/Chicago")
+
+
+class _HTMLText(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.parts = []
+
+    def handle_data(self, data):
+        self.parts.append(data)
+
+
+def _plain_text(value):
+    parser = _HTMLText()
+    parser.feed(str(value or ""))
+    return " ".join(" ".join(parser.parts).split())
+
+
+def fetch_microsoft_365_x_posts():
+    """Fetch real @MSFT365Status posts and retain only posts dated today in Central Time."""
+    checked_at = datetime.now(timezone.utc).isoformat()
+    today_ct = datetime.now(CENTRAL_TZ).date()
+    result = {
+        "provider": "microsoft_365_x",
+        "name": "Microsoft 365 Status — X Updates",
+        "account": "@MSFT365Status",
+        "status": "ok",
+        "retrieval_status": "ok",
+        "date_ct": today_ct.isoformat(),
+        "timezone": "America/Chicago",
+        "posts": [],
+        "today_count": 0,
+        "checked_at": checked_at,
+        "source": MICROSOFT_365_X_FEED_URL,
+        "account_url": "https://x.com/MSFT365Status",
+        "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
+    }
+
+    response = requests.get(
+        MICROSOFT_365_X_FEED_URL,
+        headers={"User-Agent": "CloudProvidersStatusMonitor/1.0"},
+        timeout=25,
+    )
+    response.raise_for_status()
+    feed = feedparser.parse(response.content)
+    if getattr(feed, "bozo", False) and not feed.entries:
+        raise ValueError(f"X feed returned invalid RSS: {feed.bozo_exception}")
+    if not getattr(feed, "version", "") and not feed.entries:
+        raise ValueError("X feed did not return a recognizable RSS/Atom document")
+
+    seen = set()
+    posts = []
+    for entry in feed.entries:
+        published = entry.get("published") or entry.get("updated") or ""
+        published_at = _parse_date(published)
+        # Missing/invalid timestamps are excluded rather than guessed as today's posts.
+        if published_at is None or published_at.astimezone(CENTRAL_TZ).date() != today_ct:
+            continue
+
+        raw_text = entry.get("title", "") or ""
+        content_blocks = entry.get("content") or []
+        if content_blocks:
+            candidate = content_blocks[0].get("value", "")
+            if len(candidate) > len(raw_text):
+                raw_text = candidate
+        summary = entry.get("summary", "") or ""
+        if len(summary) > len(raw_text):
+            raw_text = summary
+        post_text = _plain_text(raw_text)
+        link = str(entry.get("link", "") or "").strip()
+        identity = link or str(entry.get("id", "") or "") or f"{published}|{post_text}"
+        if not post_text or identity in seen:
+            continue
+        seen.add(identity)
+        posts.append({
+            "text": post_text,
+            "published_at": published_at.astimezone(timezone.utc).isoformat(),
+            "published_local": published_at.astimezone(CENTRAL_TZ).strftime("%I:%M %p CT").lstrip("0"),
+            "link": link,
+        })
+
+    posts.sort(key=lambda item: item["published_at"], reverse=True)
+    result["posts"] = posts[:20]
+    result["today_count"] = len(result["posts"])
+    return result
+
+
+def microsoft_365_x_unavailable(error):
+    """Keep X retrieval failure separate from Microsoft's actual service health."""
+    checked_at = datetime.now(timezone.utc).isoformat()
+    return {
+        "provider": "microsoft_365_x",
+        "name": "Microsoft 365 Status — X Updates",
+        "account": "@MSFT365Status",
+        "status": "unavailable",
+        "retrieval_status": "unavailable",
+        "date_ct": datetime.now(CENTRAL_TZ).date().isoformat(),
+        "timezone": "America/Chicago",
+        "posts": [],
+        "today_count": 0,
+        "checked_at": checked_at,
+        "source": MICROSOFT_365_X_FEED_URL,
+        "account_url": "https://x.com/MSFT365Status",
+        "description": f"X feed retrieval failed; no claim is made that there were no posts. {str(error)[:300]}",
+    }
+
 
 RECENT = timedelta(hours=12)
 STATUS_FILE = Path("status.json")
@@ -360,6 +475,11 @@ def main():
                 "incidents": [], "checked_at": datetime.now(timezone.utc).isoformat(),
                 "source": MICROSOFT_CONSUMER_URL,
             }
+
+    try:
+        results["microsoft_365_x"] = fetch_microsoft_365_x_posts()
+    except Exception as e:
+        results["microsoft_365_x"] = microsoft_365_x_unavailable(e)
 
     # Detect massive-outage transitions only (not every status change).
     prev_providers = previous.get("providers", {}) if isinstance(previous, dict) else {}
