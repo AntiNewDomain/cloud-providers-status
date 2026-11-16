@@ -95,22 +95,45 @@
       "checked_at": "2026-11-16T03:09:23.063140+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
-    "m365_admin_center": {
-      "provider": "m365_admin_center",
-      "name": "Microsoft 365 Admin Center",
-      "status": "operational",
-      "description": "Admin Center availability only \u2014 this feed does NOT cover Outlook/Teams/Exchange Online incidents.",
-      "incidents": [
-        {
-          "title": "Microsoft Admin Center",
-          "summary": "<div>This site is updated when service issues are preventing tenant administrators from accessing Service health in the Microsoft 365 admin center. Alternatively, customers can reference&nbsp;<a href=\"https://www.twitter.com/MSFT365Status\" target=\"_blank\">https://www.twitter.com/MSFT365Status</a>&nbsp;for additional insights into widespread, active incidents.</div>",
-          "published": "Mon, 16 Nov 2026 03:09:00 Z",
-          "severity": "info",
-          "link": "https://status.cloud.microsoft/"
-        }
-      ],
-      "checked_at": "2026-11-16T03:09:23.252877+00:00",
-      "source": "https://status.cloud.microsoft/api/feed/mac"
+    "m365_consumer": {
+      "provider": "m365_consumer",
+      "name": "Microsoft 365 (Consumer)",
+      "status": "unknown",
+      "description": "Waiting for the first successful check against Microsoft's public consumer status API.",
+      "incidents": [],
+      "checked_at": null,
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
+      "status_page": "https://status.cloud.microsoft/"
+    },
+    "m365_copilot": {
+      "provider": "m365_copilot",
+      "name": "Microsoft Copilot",
+      "status": "unknown",
+      "description": "Waiting for the first successful check against Microsoft's public consumer status API.",
+      "incidents": [],
+      "checked_at": null,
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
+      "status_page": "https://status.cloud.microsoft/"
+    },
+    "outlook_com": {
+      "provider": "outlook_com",
+      "name": "Outlook.com",
+      "status": "unknown",
+      "description": "Waiting for the first successful check against Microsoft's public consumer status API.",
+      "incidents": [],
+      "checked_at": null,
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
+      "status_page": "https://status.cloud.microsoft/"
+    },
+    "microsoft_teams": {
+      "provider": "microsoft_teams",
+      "name": "Microsoft Teams (Consumer / Free)",
+      "status": "unknown",
+      "description": "Waiting for the first successful check against Microsoft's public consumer status API.",
+      "incidents": [],
+      "checked_at": null,
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
+      "status_page": "https://status.cloud.microsoft/"
     }
   }
 }
