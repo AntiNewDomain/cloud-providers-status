@@ -96,11 +96,11 @@
 <body>
   <div class="container">
     <h1>Cloud Providers Status</h1>
-    <p class="subtitle">Live status from official sources · Checks about every 4–5 minutes · Dashboard refreshes every minute</p>
+    <p class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</p>
     <section class="monitor-panel" aria-live="polite">
       <div class="monitor-label">NEXT EXPECTED CHECK</div>
       <div class="countdown" id="countdown">Waiting for monitor data…</div>
-      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a five-minute schedule.</div>
+      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a 15-minute schedule.</div>
       <div class="monitor-meta" id="last-check" style="margin-top:.5rem">Last monitor update: Loading…</div>
     </section>
 
@@ -235,7 +235,7 @@
 
         lastUpdate = new Date(data.updated_at);
         document.querySelector('.subtitle').textContent =
-          'Live status from official sources · Checks scheduled every 5 minutes';
+          'Live status from official sources · Checks scheduled every 15 minutes';
         document.getElementById('last-check').textContent =
           'Last monitor data update: ' + (Number.isNaN(lastUpdate.getTime()) ? 'Unknown' : lastUpdate.toLocaleString());
         tickCountdown();
@@ -244,7 +244,7 @@
       }
     }
 
-    // Count down to the 5-minute expected interval after the last
+    // Count down to the 15-minute expected interval after the last
     // monitor data update. GitHub queue/startup time is additional: zero means
     // dispatch is due, not that a run has started or succeeded.
     let lastUpdate = null;
@@ -259,7 +259,7 @@
         return;
       }
 
-      const interval = 5 * 60 * 1000;
+      const interval = 15 * 60 * 1000;
       const expected = lastUpdate.getTime() + interval;
       const now = Date.now();
       const remaining = expected - now;
@@ -272,10 +272,10 @@
         el.className = 'countdown';
         el.textContent = `${mins}:${seconds}`;
         detail.textContent = 'Until the next expected dispatch · GitHub startup and queue time are additional.';
-      } else if (overdue <= 2 * 60 * 1000) {
+      } else if (overdue <= 5 * 60 * 1000) {
         el.className = 'countdown waiting';
         el.textContent = 'Check due — waiting for GitHub Actions';
-        detail.textContent = 'The 5:00 countdown has elapsed. Waiting for GitHub Actions to start and publish new data.';
+        detail.textContent = 'The 15:00 countdown has elapsed. Waiting for GitHub Actions to start and publish new data.';
       } else {
         const lateMins = Math.floor(overdue / 60000);
         el.className = 'countdown delayed';
