@@ -6,8 +6,8 @@ Discord alert ONLY on a massive outage (or when one clears).
 Writes status.json.
 
 Providers: Cloudflare, AWS, Microsoft Azure, Google Cloud,
-DigitalOcean, Oracle Cloud, plus Microsoft 365 Admin Center (limited —
-see below).
+DigitalOcean, Oracle Cloud, plus Microsoft's public Microsoft 365 consumer
+service-health API (including Copilot, Outlook.com, and Teams Free).
 
 Fixes vs the original version:
 - Feed providers (AWS/Azure/GCP) used to flag "outage" forever: they took
@@ -221,6 +221,8 @@ def fetch_microsoft_consumer():
             if isinstance(payload.get(key), list):
                 payload = payload[key]
                 break
+    if isinstance(payload, dict) and payload.get("ServiceDisplayName"):
+        payload = [payload]
     if not isinstance(payload, list):
         raise ValueError("Unexpected Microsoft consumer status API response format")
     records = [item for item in payload if isinstance(item, dict)]
