@@ -101,7 +101,8 @@
       <div class="monitor-label">NEXT EXPECTED CHECK</div>
       <div class="countdown" id="countdown">Waiting for monitor data…</div>
       <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a staggered 15-minute schedule.</div>
-      <div class="monitor-meta" id="last-check" style="margin-top:.5rem">Last monitor update: Loading…</div>
+      <div class="monitor-meta" id="last-check" style="margin-top:.75rem">Last monitor data update: Loading…</div>
+      <div class="monitor-meta" id="next-check">Next expected update: Loading…</div>
     </section>
 
     <div id="grid" class="grid">Loading…</div>
@@ -234,8 +235,17 @@
         lastUpdate = new Date(data.updated_at);
         document.querySelector('.subtitle').textContent =
           'Live status from official sources · Checks scheduled every 15 minutes';
-        document.getElementById('last-check').textContent =
-          'Last monitor data update: ' + (Number.isNaN(lastUpdate.getTime()) ? 'Unknown' : lastUpdate.toLocaleString());
+
+        const lastEl = document.getElementById('last-check');
+        const nextEl = document.getElementById('next-check');
+        if (Number.isNaN(lastUpdate.getTime())) {
+          lastEl.textContent = 'Last monitor data update: Unknown';
+          nextEl.textContent = 'Next expected update: Unknown';
+        } else {
+          lastEl.textContent = 'Last monitor data update: ' + lastUpdate.toLocaleString();
+          const nextTime = new Date(lastUpdate.getTime() + 15 * 60 * 1000);
+          nextEl.textContent = 'Next expected update: ' + nextTime.toLocaleString();
+        }
         tickCountdown();
       } catch (e) {
         document.getElementById('grid').textContent = 'Failed to load status.json';
