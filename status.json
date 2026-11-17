@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-17T00:30:21.004452+00:00",
+  "updated_at": "2026-11-17T00:45:19.499308+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -9,13 +9,19 @@
       "indicator": "minor",
       "incidents": [
         {
+          "name": "Network Performance Issues in Ashburn, US",
+          "status": "identified",
+          "impact": "minor",
+          "updated": "2026-11-17T00:43:25.465Z"
+        },
+        {
           "name": "Changes to Cloudflare Workers are not producing Event Subscription events",
           "status": "identified",
           "impact": "minor",
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-17T00:30:18.560325+00:00",
+      "checked_at": "2026-11-17T00:45:16.982233+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -46,7 +52,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-17T00:30:18.835697+00:00",
+      "checked_at": "2026-11-17T00:45:17.199932+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -55,7 +61,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:18.919667+00:00",
+      "checked_at": "2026-11-17T00:45:17.233636+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -72,7 +78,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-17T00:30:18.998944+00:00",
+      "checked_at": "2026-11-17T00:45:17.358206+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -82,7 +88,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.056341+00:00",
+      "checked_at": "2026-11-17T00:45:17.441752+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -92,7 +98,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.226530+00:00",
+      "checked_at": "2026-11-17T00:45:17.542230+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -101,7 +107,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.347696+00:00",
+      "checked_at": "2026-11-17T00:45:17.590900+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -111,7 +117,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.347696+00:00",
+      "checked_at": "2026-11-17T00:45:17.590900+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -121,7 +127,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.347696+00:00",
+      "checked_at": "2026-11-17T00:45:17.590900+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -131,7 +137,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-17T00:30:19.347696+00:00",
+      "checked_at": "2026-11-17T00:45:17.590900+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -145,7 +151,7 @@
       "timezone": "America/Chicago",
       "posts": [],
       "today_count": 0,
-      "checked_at": "2026-11-17T00:30:19.348533+00:00",
+      "checked_at": "2026-11-17T00:45:17.591851+00:00",
       "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror."
