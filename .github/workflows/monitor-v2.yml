@@ -1,7 +1,15 @@
 name: Cloud Status Monitor
 
 on:
+# NOTE: the `schedule:` block was intentionally removed in PR #3.
+# GitHub's built-in scheduler never fired for this workflow, so
+# cron-job.org dispatches it via workflow_dispatch every 15 minutes.
   workflow_dispatch:
+    inputs:
+      test_discord:
+        description: 'Post a labeled test message to Discord via the stored DISCORD_WEBHOOK secret (no outage is happening)'
+        type: boolean
+        default: false
   push:
     paths:
       - 'scripts/check.py'
@@ -40,6 +48,7 @@ jobs:
       - name: Run status checker
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TEST_DISCORD: ${{ inputs.test_discord }}
         run: python scripts/check.py
 
       - name: Publish status safely
