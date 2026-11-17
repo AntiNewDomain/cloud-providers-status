@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-17T19:45:29.866248+00:00",
+  "updated_at": "2026-11-17T20:00:23.477299+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -21,7 +21,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-17T19:45:18.705158+00:00",
+      "checked_at": "2026-11-17T20:00:20.718050+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -52,7 +52,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-17T19:45:18.887109+00:00",
+      "checked_at": "2026-11-17T20:00:21.124035+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -61,7 +61,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:18.948721+00:00",
+      "checked_at": "2026-11-17T20:00:21.231398+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -78,7 +78,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-17T19:45:19.015518+00:00",
+      "checked_at": "2026-11-17T20:00:21.317503+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -88,7 +88,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.133940+00:00",
+      "checked_at": "2026-11-17T20:00:21.456992+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -98,48 +98,44 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.236902+00:00",
+      "checked_at": "2026-11-17T20:00:21.620422+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
       "provider": "m365_consumer",
       "name": "Microsoft 365 (Consumer)",
-      "status": "operational",
-      "description": "Microsoft's official consumer status reports this service operational.",
+      "status": "error",
+      "description": "Microsoft consumer status API check failed: 403 Client Error: Forbidden for url: https://status.cloud.microsoft/api/posts/m365Consumer",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.300910+00:00",
-      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
-      "status_page": "https://status.cloud.microsoft/"
+      "checked_at": "2026-11-17T20:00:21.660195+00:00",
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer"
     },
     "m365_copilot": {
       "provider": "m365_copilot",
       "name": "Microsoft Copilot",
-      "status": "operational",
-      "description": "Microsoft's official consumer status reports this service operational.",
+      "status": "error",
+      "description": "Microsoft consumer status API check failed: 403 Client Error: Forbidden for url: https://status.cloud.microsoft/api/posts/m365Consumer",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.300910+00:00",
-      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
-      "status_page": "https://status.cloud.microsoft/"
+      "checked_at": "2026-11-17T20:00:21.660211+00:00",
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer"
     },
     "outlook_com": {
       "provider": "outlook_com",
       "name": "Outlook.com",
-      "status": "operational",
-      "description": "Microsoft's official consumer status reports this service operational.",
+      "status": "error",
+      "description": "Microsoft consumer status API check failed: 403 Client Error: Forbidden for url: https://status.cloud.microsoft/api/posts/m365Consumer",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.300910+00:00",
-      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
-      "status_page": "https://status.cloud.microsoft/"
+      "checked_at": "2026-11-17T20:00:21.660215+00:00",
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer"
     },
     "microsoft_teams": {
       "provider": "microsoft_teams",
       "name": "Microsoft Teams (Consumer / Free)",
-      "status": "operational",
-      "description": "Microsoft's official consumer status reports this service operational.",
+      "status": "error",
+      "description": "Microsoft consumer status API check failed: 403 Client Error: Forbidden for url: https://status.cloud.microsoft/api/posts/m365Consumer",
       "incidents": [],
-      "checked_at": "2026-11-17T19:45:19.300910+00:00",
-      "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
-      "status_page": "https://status.cloud.microsoft/"
+      "checked_at": "2026-11-17T20:00:21.660218+00:00",
+      "source": "https://status.cloud.microsoft/api/posts/m365Consumer"
     },
     "microsoft_365_x": {
       "provider": "microsoft_365_x",
@@ -151,7 +147,7 @@
       "timezone": "America/Chicago",
       "posts": [],
       "today_count": 0,
-      "checked_at": "2026-11-17T19:45:19.301812+00:00",
+      "checked_at": "2026-11-17T20:00:21.660818+00:00",
       "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror."
