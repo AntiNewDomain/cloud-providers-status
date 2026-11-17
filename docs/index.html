@@ -72,6 +72,16 @@
     .operational .dot { background: var(--green); }
     .degraded .dot { background: var(--yellow); }
     .outage .dot, .error .dot { background: var(--red); }
+    .top-alert {
+      background: #7f1d1d;
+      border: 1px solid var(--red);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .top-alert h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+    .top-alert p { font-size: 0.95rem; }
+    .top-alert .meta { color: #fecaca; }
     .meta { font-size: 0.8rem; color: var(--muted); }
     .incidents {
       margin-top: 0.75rem;
@@ -95,6 +105,7 @@
 </head>
 <body>
   <div class="container">
+    <div id="topAlert" class="top-alert" hidden></div>
     <h1>Cloud Providers Status</h1>
     <p class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</p>
     <section class="monitor-panel" aria-live="polite">
@@ -118,6 +129,28 @@
       try {
         const res = await fetch('./status.json?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
+
+        // Major-only top banner: shown only when a provider is in major
+        // outage (status "outage"). Hidden for operational, degraded,
+        // error, and stale states. Scans every provider, not just the
+        // grid groups, so nothing major can hide.
+        const banner = document.getElementById('topAlert');
+        const majors = Object.values(data.providers || {}).filter(p => p && p.status === 'outage');
+        if (majors.length) {
+          banner.innerHTML = majors.map(p => {
+            const inc = (p.incidents && p.incidents[0]) || {};
+            const title = inc.name || inc.title || '';
+            return `<h2>🚨 MAJOR OUTAGE: ${p.name}</h2>` +
+              (title ? `<p>${title}</p>` : '') +
+              `<p>Many websites/services running on or behind this provider may be down.</p>` +
+              `<p class="meta">Last update: ${new Date(data.updated_at).toLocaleString()}</p>`;
+          }).join('');
+          banner.hidden = false;
+        } else {
+          banner.innerHTML = '';
+          banner.hidden = true;
+        }
+
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
 
