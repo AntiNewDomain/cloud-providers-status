@@ -275,7 +275,14 @@ def fetch_statuspage(key):
 
 def fetch_rss_or_atom(key):
     info = SOURCES[key]
-    feed = feedparser.parse(info["url"])
+    # Fetch with a bounded timeout first, then parse the bytes: feedparser's
+    # own URL fetch has no timeout, so one hung feed could stall the whole
+    # run until the workflow's 10-minute timeout kills it and nothing is
+    # published. raise_for_status() deliberately turns an HTTP 404/500 into
+    # a provider "error" instead of a silent "operational" with 0 incidents.
+    response = requests.get(info["url"], timeout=20)
+    response.raise_for_status()
+    feed = feedparser.parse(response.content)
 
     # Only the NEWEST item decides the status, and only if it is recent
     # and unresolved. Old entries (e.g. Sep 15 AWS items still in the feed)
@@ -445,6 +452,38 @@ def save_status(data):
     DOCS_STATUS.write_text(json.dumps(data, indent=2))
 
 
+DISCORD_TEST_MESSAGE = (
+    "🧪 TEST — Cloud Status Monitor Discord webhook check. "
+    "This is only a test; no outage is happening."
+)
+
+
+def test_discord_webhook(webhook):
+    """One-off webhook check: post a labeled test message and verify HTTP 2xx.
+
+    Returns 0 on delivery, 1 on failure. The response status is checked
+    explicitly — send_discord() only prints "Discord alert sent" and never
+    looks at the status, so a wrong webhook (HTTP 404) would otherwise
+    look like success. Run with TEST_DISCORD=1 (set by the workflow's
+    test_discord input); exits before any status check runs.
+    """
+    if not webhook:
+        print("Discord test FAILED: no DISCORD_WEBHOOK set")
+        return 1
+    try:
+        response = requests.post(
+            webhook, json={"content": DISCORD_TEST_MESSAGE}, timeout=10
+        )
+    except Exception as e:
+        print(f"Discord test FAILED: {e}")
+        return 1
+    if 200 <= response.status_code < 300:
+        print(f"Discord test delivered (HTTP {response.status_code})")
+        return 0
+    print(f"Discord test FAILED: HTTP {response.status_code}")
+    return 1
+
+
 def send_discord(webhook, message):
     if not webhook:
         print("No DISCORD_WEBHOOK set — skipping alert")
@@ -462,6 +501,12 @@ def is_massive(result):
 
 
 def main():
+    # Discord webhook test mode: verify the stored secret delivers, then
+    # exit before any status check runs. Set by the workflow's test_discord
+    # input via the TEST_DISCORD env var.
+    if os.environ.get("TEST_DISCORD"):
+        raise SystemExit(test_discord_webhook(os.environ.get("DISCORD_WEBHOOK")))
+
     previous = load_previous()
     results = {}
 
