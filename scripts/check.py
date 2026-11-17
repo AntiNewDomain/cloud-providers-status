@@ -464,8 +464,8 @@ def test_discord_webhook(webhook):
     Returns 0 on delivery, 1 on failure. The response status is checked
     explicitly — send_discord() only prints "Discord alert sent" and never
     looks at the status, so a wrong webhook (HTTP 404) would otherwise
-    look like success. Run with TEST_DISCORD=1 (set by the workflow's
-    test_discord input); exits before any status check runs.
+    look like success. Run with TEST_DISCORD=1 or TEST_DISCORD=true (set by
+    the workflow's test_discord input); exits before any status check runs.
     """
     if not webhook:
         print("Discord test FAILED: no DISCORD_WEBHOOK set")
@@ -504,7 +504,7 @@ def main():
     # Discord webhook test mode: verify the stored secret delivers, then
     # exit before any status check runs. Set by the workflow's test_discord
     # input via the TEST_DISCORD env var.
-    if os.environ.get("TEST_DISCORD"):
+    if os.environ.get("TEST_DISCORD", "").strip().lower() in ("1", "true"):
         raise SystemExit(test_discord_webhook(os.environ.get("DISCORD_WEBHOOK")))
 
     previous = load_previous()
