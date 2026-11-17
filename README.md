@@ -6,33 +6,47 @@ A free, lightweight monitor that checks the **official public status pages** of 
 
 ## Providers Monitored
 
-| Provider              | Source Type      | Official Endpoint |
-|-----------------------|------------------|-------------------|
-| Cloudflare            | JSON API         | cloudflarestatus.com/api/v2/summary.json |
-| Amazon Web Services   | RSS              | status.aws.amazon.com/rss/all.rss |
-| Microsoft Azure       | RSS              | rssfeed.azure.status.microsoft/en-us/status/feed/ |
-| Google Cloud          | Atom             | status.cloud.google.com/en/feed.atom |
-| DigitalOcean          | JSON API         | status.digitalocean.com/api/v2/summary.json |
-| Oracle Cloud          | JSON API         | ocistatus.oraclecloud.com/api/v2/status.json |
-| Microsoft 365 Admin Center | RSS       | status.cloud.microsoft/api/feed/mac |
+| Provider | Source Type | Official Endpoint |
+|----------|-------------|-------------------|
+| Cloudflare | JSON API | cloudflarestatus.com/api/v2/summary.json |
+| Amazon Web Services | RSS | status.aws.amazon.com/rss/all.rss |
+| Microsoft Azure | RSS | rssfeed.azure.status.microsoft/en-us/status/feed/ |
+| Google Cloud | Atom | status.cloud.google.com/en/feed.atom |
+| DigitalOcean | JSON API | status.digitalocean.com/api/v2/summary.json |
+| Oracle Cloud | JSON API | ocistatus.oraclecloud.com/api/v2/status.json |
+| Microsoft 365 (Consumer) | JSON API | status.cloud.microsoft/api/posts/m365Consumer |
+| @MSFT365Status on X | Third-party RSS mirrors | See "Known limitations" below |
 
-Only official public sources are used. No third-party status aggregators. No China-based providers are included.
+Microsoft 365 (Consumer) covers the consumer workloads Microsoft publishes through that endpoint — Microsoft 365 (Consumer), Copilot, Outlook.com, and Microsoft Teams Free. It is separate from tenant-specific Microsoft 365 business health, which still requires an administrator sign-in.
 
-## Features
+Only official public sources are used, except for the @MSFT365Status X posts, which come through third-party mirrors (see below). No China-based providers are included.
 
-- Checks every **15 minutes** automatically
-- Live dashboard on GitHub Pages
-- Detects status changes
-- Optional Discord alerts for massive outages only (plus one message when a massive outage clears)
-- Completely free (runs on GitHub Actions)
-- Independent of the providers being monitored
+## How It Runs
 
-## Current Status
+- An external dispatcher, **cron-job.org**, starts the workflow **every 15 minutes** through `workflow_dispatch`.
+- The workflow has **no native GitHub schedule block**. It was removed in PR #3 because GitHub's built-in scheduler was skipping runs. The triggers are `workflow_dispatch` plus `push` to `scripts/check.py` or the workflow file itself.
+- Each run checks every provider, writes `status.json` (root) and `docs/status.json`, and publishes to GitHub Pages. Runs are serialized (one at a time) so an older run can never overwrite a newer result, and each run has a 10-minute timeout.
+- The dashboard refreshes from `status.json` and shows the last completed run's timestamp. Expect up to 15 minutes of lag by design.
 
-The monitor is already deployed and running.
-You only need to complete the optional Discord alert setup if you want notifications.
+## How Status Is Decided
 
-### Optional: Enable Discord Alerts
+- **Statuspage providers** (Cloudflare, DigitalOcean, Oracle): the provider's own indicator decides. `major` or `critical` means outage; `minor` means degraded.
+- **Feed providers** (AWS, Azure, Google Cloud): only the **newest** feed item decides, and only if it is recent (under 12 hours) and unresolved. Older entries cannot keep a provider stuck on outage after it resolved. The last 3 items are still kept so the dashboard can show recent history — they do not affect the status.
+- **Feed wording:** an item is read as an outage when its title or summary contains "outage", "disruption", "unavailable", or "major". It is read as degraded when it contains "degraded", "elevated", "increased error", or "impact". See "Known limitations" for what that misses.
+- **Microsoft 365 (Consumer):** the aggregate card reports the worst status across the consumer workloads; product cards use their own workload records.
+- A provider that cannot be reached, or whose check fails, shows as `error` — never as a stale copy of its last good state.
+
+## Major-Outage Banner
+
+When any provider is in a major outage (status `outage`), a red banner appears at the **very top of the dashboard**, above the title and every card, naming the provider and its incident. It shows **only** for a major outage — it stays hidden for operational, degraded, error, and stale states — and it scans every provider, not just the grouped cards, so nothing major can hide.
+
+## Alerts
+
+### Discord
+
+A Discord message is sent **only** when a provider enters a massive outage, plus one message when it clears. Minor or degraded incidents do not alert.
+
+Setup:
 
 1. Create a Discord webhook in your server (Server Settings → Integrations → Webhooks)
 2. Go to [Repository Secrets](https://github.com/AntiNewDomain/cloud-providers-status/settings/secrets/actions)
@@ -40,7 +54,11 @@ You only need to complete the optional Discord alert setup if you want notificat
 4. Name: `DISCORD_WEBHOOK`
 5. Paste your webhook URL and save
 
-Once added, you will receive a Discord message only when a provider has a massive outage (major/critical), and one message when it clears. Minor or degraded incidents do not alert.
+A `test_discord` workflow input is being added so the stored webhook can be tested on demand with a clearly labeled test message (it checks for a successful delivery, it does not reuse the outage alert format).
+
+### Independent DM watch
+
+Separately from this repository, a 15-minute watch checks the official sources directly and sends a direct message on a massive outage. It does not depend on GitHub, cron-job.org, or this dashboard, so it still alerts if the pipeline itself stops. It also includes a **staleness watchdog**: if the dashboard has not updated in over 40 minutes, it sends one alert, and one recovery message when updates resume.
 
 ## Manual Run
 
@@ -52,17 +70,17 @@ You can trigger a check immediately:
 
 ## Files
 
-- `.github/workflows/monitor-v2.yml` — scheduled workflow
-- `scripts/check.py` — status checker script
+- `.github/workflows/monitor-v2.yml` — workflow (triggered by cron-job.org via `workflow_dispatch`, plus `push`)
+- `scripts/check.py` — status checker
 - `docs/` — dashboard (GitHub Pages)
-- `status.json` — latest status data
+- `status.json` — latest status data (also used to detect status changes between runs)
 
-## Notes
+## Known Limitations
 
+- **@MSFT365Status on X is third-party mirrors only.** The posts are fetched through independent mirrors (FxEmbed, Nitter instances, RSSHub). They are not an official feed, and they may fail. The dashboard labels them as retrieved through a third-party mirror.
+- **Enterprise Microsoft 365 outages are not covered.** Microsoft publishes no anonymous public incident feed for enterprise Microsoft 365. This monitor uses the consumer endpoint and the @MSFT365Status posts; it did not list the Nov 12–14, 2026 Outlook/Teams outage (MO1550821 / EX1550543). Full Microsoft 365 service health needs a tenant login.
+- **Keyword blind spot.** An incident worded "Increased error rates" matches the degraded keywords, not the outage keywords — so a genuinely major incident phrased that way shows as degraded, triggers no massive alert, and shows no top banner. The wording lists are deliberately kept narrow to avoid false positives.
+- **Fastly is intentionally excluded:** its status API returns HTTP 403 from GitHub Actions-style runners.
+- **Single dispatcher.** cron-job.org is the only trigger. If it stops dispatching, the dashboard goes stale and the independent DM watch's staleness watchdog is the backstop that reports it.
 - This uses provider-reported public status only. It is not independent uptime probing.
 - Account-specific health events (AWS Health, Azure Service Health, etc.) are not included.
-- Feed providers are judged on their newest item only, and only if it is recent (under 12 hours) and unresolved — older feed entries cannot keep a provider stuck on outage after it resolved.
-- Microsoft 365 / Outlook / Teams limitation: Microsoft publishes no anonymous public incident feed for Microsoft 365. The feed listed above reports only whether the Microsoft 365 Admin Center itself is Available; it did not list the Nov 12–14, 2026 Outlook/Teams outage (MO1550821 / EX1550543), and it never triggers a massive-outage alert. Full Microsoft 365 service health needs a tenant login.
-- Fastly is intentionally excluded: its status API returns HTTP 403 from GitHub Actions-style runners.
-- GitHub Actions scheduled runs are best-effort and can lag; the dashboard timestamp shows the last completed run.
-- The schedule is set to every 15 minutes for reliability (5-minute schedules are frequently delayed or skipped by GitHub).
