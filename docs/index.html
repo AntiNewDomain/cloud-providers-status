@@ -94,6 +94,7 @@
     .x-post-time { color: var(--muted); font-size: .78rem; }
     .x-post-text { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
     .x-feed-note { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
+    .x-issue-warning { color: var(--yellow); font-size: .95rem; font-weight: 700; margin-top: .9rem; }
     footer {
       margin-top: 2.5rem;
       text-align: center;
@@ -236,6 +237,12 @@
             card.appendChild(empty);
           } else {
             for (const post of xFeed.posts) {
+              if (post.possible_issue) {
+                const warn = document.createElement('p');
+                warn.className = 'x-issue-warning';
+                warn.textContent = '⚠️ Possible enterprise issue — via X (unofficial, not confirmed)';
+                card.appendChild(warn);
+              }
               const item = document.createElement('article');
               item.className = 'x-post';
               const time = document.createElement('div');
