@@ -111,6 +111,43 @@ def _plain_text(value):
     return " ".join(" ".join(parser.parts).split())
 
 
+_X_ACTIVE_ISSUE_PHRASES = (
+    "investigating an issue",
+    "investigating reports",
+    "we're investigating",
+    "we are investigating",
+    "service degradation",
+    "unable to access",
+    "unable to sign in",
+    "experiencing issues",
+    "service disruption",
+)
+_X_RESOLVED_PHRASES = (
+    "restored",
+    "resolved",
+    "post-incident report",
+    "preliminary",
+    "mitigated",
+    "no longer",
+    "back to normal",
+)
+
+
+def _x_post_is_active_issue(text):
+    """True only for a post that reads as an ACTIVE enterprise issue.
+
+    A post must contain an investigating/active phrase AND must not contain
+    any restored/resolved wording. Retrospective posts such as
+    "We have released the Preliminary Post-Incident Report of last week's
+    outage" mention "outage" but are not active issues and must not flag.
+    Bare "outage" is deliberately NOT an active phrase for that reason.
+    """
+    lower = (text or "").lower()
+    if any(phrase in lower for phrase in _X_RESOLVED_PHRASES):
+        return False
+    return any(phrase in lower for phrase in _X_ACTIVE_ISSUE_PHRASES)
+
+
 def fetch_microsoft_365_x_posts():
     """Fetch real @MSFT365Status posts and retain only posts dated today in Central Time."""
     checked_at = datetime.now(timezone.utc).isoformat()
@@ -190,6 +227,15 @@ def fetch_microsoft_365_x_posts():
     posts.sort(key=lambda item: item["published_at"], reverse=True)
     result["posts"] = posts[:20]
     result["today_count"] = len(result["posts"])
+    # Display-only enterprise-issue flag. Gated on posts actually being
+    # returned (today_count > 0): retrieval_status "ok" alone does not prove
+    # posts were returned — a valid feed with zero entries is still "ok".
+    # A flagged post never changes the entry's status, so it cannot trigger
+    # a massive-outage alert, Discord message, DM, or dashboard banner.
+    flagged = [post for post in result["posts"] if _x_post_is_active_issue(post["text"])]
+    for post in flagged:
+        post["possible_issue"] = True
+    result["possible_issue"] = bool(flagged)
     return result
 
 
@@ -206,6 +252,7 @@ def microsoft_365_x_unavailable(error):
         "timezone": "America/Chicago",
         "posts": [],
         "today_count": 0,
+        "possible_issue": False,
         "checked_at": checked_at,
         "source": "; ".join(MICROSOFT_365_X_FEED_URLS),
         "account_url": "https://x.com/MSFT365Status",
