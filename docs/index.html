@@ -82,6 +82,16 @@
     .top-alert h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
     .top-alert p { font-size: 0.95rem; }
     .top-alert .meta { color: #fecaca; }
+    .stale-strip {
+      background: #451a03;
+      border: 1px solid var(--yellow);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .stale-strip h2 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .stale-strip p { font-size: 0.95rem; }
+    .stale-strip .meta { color: #fef08a; }
     .meta { font-size: 0.8rem; color: var(--muted); }
     .incidents {
       margin-top: 0.75rem;
@@ -108,6 +118,7 @@
     <div id="topAlert" class="top-alert" hidden></div>
     <h1>Cloud Providers Status</h1>
     <p class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</p>
+    <div id="staleStrip" class="stale-strip" hidden></div>
     <section class="monitor-panel" aria-live="polite">
       <div class="monitor-label">NEXT EXPECTED CHECK</div>
       <div class="countdown" id="countdown">Waiting for monitor data…</div>
@@ -132,8 +143,10 @@
 
         // Major-only top banner: shown only when a provider is in major
         // outage (status "outage"). Hidden for operational, degraded,
-        // error, and stale states. Scans every provider, not just the
-        // grid groups, so nothing major can hide.
+        // and error states. Note: staleness is NOT checked here — a stale
+        // snapshot carrying an outage provider still shows the banner.
+        // Scans every provider, not just the grid groups, so nothing
+        // major can hide.
         const banner = document.getElementById('topAlert');
         const majors = Object.values(data.providers || {}).filter(p => p && p.status === 'outage');
         if (majors.length) {
@@ -149,6 +162,23 @@
         } else {
           banner.innerHTML = '';
           banner.hidden = true;
+        }
+
+        // Stale-data strip: shown when the newest data is more than 20
+        // minutes old — the same threshold as the DELAYED countdown
+        // (expected check at last update + 15 min, overdue by more than
+        // 5 min). Hidden when fresh. Reuses updated_at; no checker change.
+        const staleStrip = document.getElementById('staleStrip');
+        const dataAgeMin = (Date.now() - new Date(data.updated_at).getTime()) / 60000;
+        if (!Number.isNaN(dataAgeMin) && dataAgeMin > 20) {
+          const mins = Math.floor(dataAgeMin);
+          staleStrip.innerHTML =
+            `<h2>⚠️ Dashboard data is stale</h2>` +
+            `<p>Last update ${mins} minute${mins === 1 ? '' : 's'} ago (checks run every 15 min). The monitor or its dispatcher may be down.</p>`;
+          staleStrip.hidden = false;
+        } else {
+          staleStrip.innerHTML = '';
+          staleStrip.hidden = true;
         }
 
         const grid = document.getElementById('grid');
