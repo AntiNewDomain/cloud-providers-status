@@ -240,6 +240,14 @@
         const present = allKeys.map(k => providers[k]).filter(Boolean);
         const outages = present.filter(p => p.status === 'outage').length;
         const degraded = present.filter(p => p.status === 'degraded').length;
+        // error/unknown: real states (check.py sets "error" on feed fetch
+        // failure; rowHtml defaults a missing status to "unknown"). Any
+        // status that is not operational/degraded/outage counts here, so
+        // the verdict can never contradict the rows below it.
+        const issues = present.filter(p => {
+          const st = p.status || 'unknown';
+          return st !== 'operational' && st !== 'degraded' && st !== 'outage';
+        }).length;
         const operational = present.filter(p => p.status === 'operational').length;
         const totalIncidents = present.reduce((n, p) => n + ((p.incidents && p.incidents.length) || 0), 0);
 
@@ -249,10 +257,13 @@
           bar.classList.add('outage');
           bar.classList.remove('degraded');
           verdict.innerHTML = `<strong class="bad">${outages} outage${outages === 1 ? '' : 's'}</strong>`;
-        } else if (degraded > 0) {
+        } else if (degraded > 0 || issues > 0) {
           bar.classList.remove('outage');
           bar.classList.add('degraded');
-          verdict.innerHTML = `<strong>${degraded} degraded</strong>`;
+          const parts = [];
+          if (degraded > 0) parts.push(`${degraded} degraded`);
+          if (issues > 0) parts.push(`${issues} with issues`);
+          verdict.innerHTML = `<strong>${parts.join(' · ')}</strong>`;
         } else {
           bar.classList.remove('outage');
           bar.classList.remove('degraded');
