@@ -15,9 +15,13 @@ A free, lightweight monitor that checks the **official public status pages** of 
 | DigitalOcean | JSON API | status.digitalocean.com/api/v2/summary.json |
 | Oracle Cloud | JSON API | ocistatus.oraclecloud.com/api/v2/status.json |
 | Microsoft 365 (Consumer) | JSON API | status.cloud.microsoft/api/posts/m365Consumer |
+| Outlook front door | Direct probe | outlook.office.com |
+| Teams front door | Direct probe | teams.microsoft.com |
 | @MSFT365Status on X | Third-party RSS mirrors | See "Known limitations" below |
 
 Microsoft 365 (Consumer) covers the consumer workloads Microsoft publishes through that endpoint — Microsoft 365 (Consumer), Copilot, Outlook.com, and Microsoft Teams Free. It is separate from tenant-specific Microsoft 365 business health, which still requires an administrator sign-in.
+
+Enterprise Outlook and Teams have no public incident feed, so the monitor also probes their front doors (outlook.office.com, teams.microsoft.com) directly. A redirect to the login page counts as healthy; only a connection failure, a timeout, or a 5xx counts as a failure, and it takes three consecutive failures to flag. The probes are display-only — they never raise the banner or an alert. A green probe proves only that the front door loads, not that the service works.
 
 Only official public sources are used, except for the @MSFT365Status X posts, which come through third-party mirrors (see below). No China-based providers are included.
 
@@ -78,7 +82,7 @@ You can trigger a check immediately:
 ## Known Limitations
 
 - **@MSFT365Status on X is third-party mirrors only.** The posts are fetched through independent mirrors (FxEmbed, Nitter instances, RSSHub). They are not an official feed, and they may fail. The dashboard labels them as retrieved through a third-party mirror.
-- **Enterprise Microsoft 365 outages are not covered.** Microsoft publishes no anonymous public incident feed for enterprise Microsoft 365. This monitor uses the consumer endpoint and the @MSFT365Status posts; it did not list the Nov 12–14, 2026 Outlook/Teams outage (MO1550821 / EX1550543). Full Microsoft 365 service health needs a tenant login.
+- **Enterprise Microsoft 365 outages are not covered.** Microsoft publishes no anonymous public incident feed for enterprise Microsoft 365. This monitor uses the consumer endpoint and the @MSFT365Status posts; it did not list the Nov 12–14, 2026 Outlook/Teams outage (MO1550821 / EX1550543). Full Microsoft 365 service health needs a tenant login. The front-door probes narrow this gap only slightly: they detect a down front door, not a service-level outage.
 - **Keyword blind spot.** An incident worded "Increased error rates" matches the degraded keywords, not the outage keywords — so a genuinely major incident phrased that way shows as degraded, triggers no massive alert, and shows no top banner. The wording lists are deliberately kept narrow to avoid false positives.
 - **Fastly is intentionally excluded:** its status API returns HTTP 403 from GitHub Actions-style runners.
 - **Single dispatcher.** cron-job.org is the only trigger. If it stops dispatching, the dashboard goes stale and the independent DM watch's staleness watchdog is the backstop that reports it.

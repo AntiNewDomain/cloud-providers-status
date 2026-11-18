@@ -119,7 +119,7 @@
     <div id="grid" class="grid">Loading…</div>
 
     <footer>
-      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API; Microsoft 365 Status X feed via third-party RSS mirror<br>
+      Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API; Microsoft 365 Status X feed via third-party RSS mirror; Outlook/Teams front-door probes<br>
       <a href="https://github.com/AntiNewDomain/cloud-providers-status">View source on GitHub</a>
     </footer>
   </div>
@@ -161,7 +161,7 @@
           },
           {
             title: 'Microsoft',
-            keys: ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams']
+            keys: ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams', 'outlook_front_door', 'teams_front_door']
           }
         ];
         for (const group of groups) {
