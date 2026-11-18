@@ -152,6 +152,16 @@
     .d-status.deg { color: var(--amber-bright); }
     .d-status.out { color: var(--red-bright); }
     .d-status.unknown { color: var(--muted); }
+    /* Front-door probe indicator, folded into the parent row (PR #9
+       probes stay as separate keys in status.json; they are no longer
+       separate rows). Sits under the parent's own status; the parent's
+       status, dot and row colour never change because of a probe. */
+    .d-statuscell { display: flex; flex-direction: column; gap: 2px; }
+    .d-probe { font-size: 10px; font-weight: 600; white-space: normal; }
+    .d-probe.ok { color: var(--green-bright); }
+    .d-probe.bad { color: var(--amber-bright); }
+    .d-probe.unknown { color: var(--muted); }
+    .d-probe-warn { color: var(--amber-bright); font-weight: 700; }
     .d-count { color: var(--muted); font-size: 12px; }
     .d-inc { color: #aeb9c4; font-size: 12px; line-height: 1.5; grid-column: 2 / 4; }
     @media (max-width: 719px) {
@@ -247,7 +257,12 @@
 
         const providers = data.providers || {};
         const mainKeys = ['cloudflare', 'aws', 'gcp', 'digitalocean', 'oracle'];
-        const msKeys = ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams', 'outlook_front_door', 'teams_front_door'];
+        const msKeys = ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams'];
+        // Front-door probes are folded into their parent rows (Chairman,
+        // Nov 17): they are NOT separate providers and are NOT counted
+        // in the summary bar (10 providers, 10 rows). check.py still
+        // writes them as separate keys in status.json.
+        const probeFor = { outlook_com: 'outlook_front_door', microsoft_teams: 'teams_front_door' };
         const allKeys = mainKeys.concat(msKeys);
 
         // Summary bar: overall verdict, degraded/operational counts,
@@ -322,7 +337,7 @@
         const tables = document.getElementById('tables');
         tables.innerHTML = '';
 
-        function rowHtml(p) {
+        function rowHtml(p, probe) {
           const status = p.status || 'unknown';
           const dotClass = status === 'operational' ? 'ok'
             : status === 'degraded' ? 'deg'
@@ -341,10 +356,30 @@
               return `${title}${st}`;
             }).join(' · ');
           }
+          // Probe indicator next to the parent's own status. A failed
+          // probe (status "error", 3 consecutive failures) shows an
+          // amber warning in the row, but the parent's status, dot and
+          // row colour stay exactly as reported — a probe can never
+          // turn a parent into "outage" or raise the banner/alerts.
+          let probeHtml = '';
+          if (probe) {
+            const pst = probe.status || 'unknown';
+            if (pst === 'error') {
+              const fails = (typeof probe.consecutive_failures === 'number' && probe.consecutive_failures >= 3)
+                ? probe.consecutive_failures : 3;
+              probeHtml = `<span class="d-probe bad">⚠️ Front door down</span>`;
+              const warnHtml = `<span class="d-probe-warn">⚠️ Front door unreachable (${fails} failed checks)</span>`;
+              incHtml = incHtml === '—' ? warnHtml : incHtml + ' · ' + warnHtml;
+            } else if (pst === 'operational') {
+              probeHtml = `<span class="d-probe ok">Front door OK</span>`;
+            } else {
+              probeHtml = `<span class="d-probe unknown">Front door unknown</span>`;
+            }
+          }
           return `<div class="d-row ${rowClass}">` +
             `<span class="sdot ${dotClass}"></span>` +
             `<span class="d-name">${esc(p.name)}</span>` +
-            `<span class="d-status ${dotClass}">${esc(status)}</span>` +
+            `<div class="d-statuscell"><span class="d-status ${dotClass}">${esc(status)}</span>${probeHtml}</div>` +
             `<span class="d-count">${esc(countText)}</span>` +
             `<span class="d-inc">${incHtml}</span>` +
             `</div>`;
@@ -358,7 +393,7 @@
           for (const key of keys) {
             const p = providers[key];
             if (!p) continue;
-            html += rowHtml(p);
+            html += rowHtml(p, providers[probeFor[key]]);
           }
           return html + '</div>';
         }
