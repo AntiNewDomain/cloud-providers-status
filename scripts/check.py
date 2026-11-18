@@ -10,6 +10,15 @@ DigitalOcean, Oracle Cloud, plus Microsoft's public Microsoft 365 consumer
 service-health API (including Copilot, Outlook.com, and Teams Free). Today's
 @MSFT365Status posts are retrieved separately through a third-party RSS mirror.
 
+Enterprise Outlook and Teams have no public incident feed, so their front
+doors (outlook.office.com, teams.microsoft.com) are probed directly. A
+redirect to the login page counts as healthy. Only a connection failure, a
+timeout, or a 5xx counts as a failure, and it takes three consecutive
+failures to flag — one failure does nothing, so a flaky network hop cannot
+cry outage. The probes are display-only: their status is never "outage",
+so they cannot raise a banner or a Discord/DM alert. A green probe proves
+only that the front door loads, not that mail or Teams service works.
+
 Fixes vs the original version:
 - Feed providers (AWS/Azure/GCP) used to flag "outage" forever: they took
   the first 8 feed items and flagged any with "disruption" in the title,
@@ -263,6 +272,112 @@ def microsoft_365_x_unavailable(error):
 RECENT = timedelta(hours=12)
 STATUS_FILE = Path("status.json")
 DOCS_STATUS = Path("docs/status.json")
+
+
+# Enterprise front-door probes (see module docstring). A redirect to the
+# login page counts as healthy; only a connection failure, a timeout, or a
+# 5xx counts as a failure. An unexpected status (e.g. 4xx) is inconclusive:
+# it neither resets nor increments the failure count, because it may mean
+# Microsoft is blocking automated checks rather than the door being down.
+FRONT_DOOR_PROBES = {
+    "outlook_front_door": {
+        "name": "Outlook front door",
+        "url": "https://outlook.office.com",
+    },
+    "teams_front_door": {
+        "name": "Teams front door",
+        "url": "https://teams.microsoft.com",
+    },
+}
+FRONT_DOOR_TIMEOUT = 10
+FRONT_DOOR_FAILS_TO_FLAG = 3
+
+
+def _probe_front_door(key, previous_count):
+    """Probe one front door. previous_count is the consecutive-failure count
+    carried forward from the last run (0 when the last probe was healthy)."""
+    info = FRONT_DOOR_PROBES[key]
+    checked_at = datetime.now(timezone.utc).isoformat()
+    try:
+        response = requests.get(
+            info["url"],
+            headers={"User-Agent": "CloudProvidersStatusMonitor/1.0"},
+            timeout=FRONT_DOOR_TIMEOUT,
+        )
+        if 200 <= response.status_code < 400:
+            outcome, detail = "ok", f"Front door answered HTTP {response.status_code}."
+        elif response.status_code >= 500:
+            outcome, detail = "failed", f"Front door returned HTTP {response.status_code}."
+        else:
+            outcome, detail = "inconclusive", f"Front door returned unexpected HTTP {response.status_code}."
+    except Exception as e:
+        outcome, detail = "failed", f"Front door check failed: {e}"
+
+    if outcome == "ok":
+        count = 0
+    elif outcome == "failed":
+        count = previous_count + 1
+    else:  # inconclusive: neither success nor failure; keep the count
+        count = previous_count
+
+    # Display-only: status is "error" at most, never "outage", so a flagged
+    # front door cannot raise the top banner or a Discord/DM alert.
+    if count >= FRONT_DOOR_FAILS_TO_FLAG:
+        status = "error"
+        description = (
+            f"⚠️ {info['name']} unreachable ({count} failed checks). {detail} "
+            "A probe only shows the front door is down — it does not prove "
+            "the service is down, and a failure can be this runner's own "
+            "network, not Microsoft."
+        )
+    elif outcome == "inconclusive":
+        status = "operational"
+        description = (
+            f"{info['name']}: last check was inconclusive. {detail} "
+            "Not counted as a failure."
+            + (f" ({count} failed check(s) banked; "
+               f"{FRONT_DOOR_FAILS_TO_FLAG} needed to flag.)" if count else "")
+        )
+    elif outcome == "failed":
+        status = "operational"
+        description = (
+            f"{info['name']}: last check failed ({count} of "
+            f"{FRONT_DOOR_FAILS_TO_FLAG} failed checks needed to flag). "
+            f"{detail} Not flagged yet — a single failure can be the "
+            "runner's own network."
+        )
+    else:
+        status = "operational"
+        description = (
+            f"{info['name']} reachable — the front door loads and redirects "
+            "to the Microsoft login page. A green probe only proves the "
+            "front door loads, not that the service works."
+        )
+
+    return {
+        "provider": key,
+        "name": info["name"],
+        "status": status,
+        "description": description,
+        "consecutive_failures": count,
+        "incidents": [],
+        "checked_at": checked_at,
+        "source": info["url"],
+    }
+
+
+def fetch_front_doors(previous_providers):
+    """Probe both enterprise front doors, carrying each failure count forward
+    from the previous run's status.json (the load_previous() state)."""
+    output = {}
+    for key in FRONT_DOOR_PROBES:
+        prev = previous_providers.get(key, {}) if isinstance(previous_providers, dict) else {}
+        try:
+            previous_count = int(prev.get("consecutive_failures", 0) or 0)
+        except (TypeError, ValueError):
+            previous_count = 0
+        output[key] = _probe_front_door(key, previous_count)
+    return output
 
 
 def _parse_date(value):
@@ -593,13 +708,38 @@ def main():
     except Exception as e:
         results["microsoft_365_x"] = microsoft_365_x_unavailable(e)
 
+    # Enterprise front-door probes. A failure inside the probe code itself
+    # must never take down the whole run: carry the previous probe entries
+    # forward so the consecutive-failure count is not lost.
+    try:
+        results.update(fetch_front_doors(
+            previous.get("providers", {}) if isinstance(previous, dict) else {}
+        ))
+    except Exception as e:
+        prev_providers = previous.get("providers", {}) if isinstance(previous, dict) else {}
+        for key, info in FRONT_DOOR_PROBES.items():
+            if key in prev_providers:
+                results[key] = prev_providers[key]
+            else:
+                results[key] = {
+                    "provider": key, "name": info["name"], "status": "unknown",
+                    "description": f"Front-door probe failed to run: {e}",
+                    "consecutive_failures": 0, "incidents": [],
+                    "checked_at": datetime.now(timezone.utc).isoformat(),
+                    "source": info["url"],
+                }
+
     # Detect massive-outage transitions only (not every status change).
     prev_providers = previous.get("providers", {}) if isinstance(previous, dict) else {}
     new_massive = []
     cleared_massive = []
     for key, current in results.items():
         prev = prev_providers.get(key, {})
-        if key in ("m365_copilot", "outlook_com", "microsoft_teams"):
+        # Consumer sub-cards and front-door probes never alert: the consumer
+        # cards are covered by the aggregate consumer entry, and the probes
+        # are display-only by design (their status is never "outage").
+        if key in ("m365_copilot", "outlook_com", "microsoft_teams",
+                   "outlook_front_door", "teams_front_door"):
             continue
         was_massive = prev.get("status") == "outage"
         now_massive = is_massive(current)
