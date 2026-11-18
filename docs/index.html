@@ -4,120 +4,194 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cloud Providers Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
+      --bg: #101418;
+      --panel: #171d24;
+      --text: #d6dde5;
+      --bright: #f3f6f9;
+      --muted: #7d8896;
+      --dim: #5d6874;
+      --border: #262d36;
       --green: #22c55e;
+      --green-bright: #4ade80;
       --yellow: #eab308;
+      --amber: #f59e0b;
+      --amber-bright: #fbbf24;
       --red: #ef4444;
+      --red-bright: #f87171;
       --blue: #3b82f6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
-      padding: 2rem 1rem;
+      font-size: 13px;
     }
-    .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
-    .subtitle { color: var(--muted); margin-bottom: 0.5rem; font-size: 0.95rem; }
-    .monitor-panel {
-      background: var(--card);
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin: 1rem 0 2rem;
-    }
-    .monitor-label { color: var(--muted); font-size: 0.78rem; font-weight: 700; letter-spacing: .06em; }
-    .countdown { color: var(--green); font-size: clamp(2rem, 7vw, 3rem); line-height: 1.15; font-weight: 750; font-variant-numeric: tabular-nums; margin: .25rem 0; }
-    .countdown.waiting { color: var(--yellow); font-size: 1.15rem; }
-    .countdown.delayed { color: var(--red); font-size: 1.25rem; }
-    .monitor-meta { color: var(--muted); font-size: .85rem; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
-    }
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 1.25rem;
-      border: 1px solid #334155;
-    }
-    .card h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    .group-heading {
-      grid-column: 1 / -1;
-      font-size: 1.35rem;
-      margin: 1rem 0 0;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #334155;
-    }
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-weight: 600;
-      text-transform: capitalize;
-      margin-bottom: 0.75rem;
-    }
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-    }
-    .operational .dot { background: var(--green); }
-    .degraded .dot { background: var(--yellow); }
-    .outage .dot, .error .dot { background: var(--red); }
+    .container { max-width: 1020px; margin: 0 auto; padding: 16px 12px 18px; }
+    a { color: var(--blue); }
+
+    /* Major-only top banner: first element, above everything. */
     .top-alert {
-      background: #7f1d1d;
-      border: 1px solid var(--red);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
+      background: #dc2626;
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-family: Inter, sans-serif;
+      font-size: 13.5px;
+      border-radius: 6px;
+      margin-bottom: 12px;
     }
-    .top-alert h2 { font-size: 1.25rem; margin-bottom: 0.25rem; }
-    .top-alert p { font-size: 0.95rem; }
+    .top-alert[hidden] { display: none; }
+    .top-alert h2 { font-size: 1.1rem; }
+    .top-alert p { font-size: 0.95rem; font-weight: 400; }
     .top-alert .meta { color: #fecaca; }
-    .meta { font-size: 0.8rem; color: var(--muted); }
-    .incidents {
-      margin-top: 0.75rem;
-      font-size: 0.85rem;
+
+    /* Slim status summary bar — the at-a-glance verdict. */
+    .f-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      align-items: center;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 14px;
+      font-size: 12.5px;
+      color: #aeb9c4;
+      margin-bottom: 16px;
     }
-    .incidents li { margin-bottom: 0.4rem; }
-    .x-updates-card { grid-column: 1 / -1; }
+    .f-summary .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); flex: none; }
+    .f-summary strong { color: var(--bright); font-family: Inter, sans-serif; font-size: 13px; }
+    .f-summary .sep { color: #3a434e; }
+    .f-summary .warn { color: var(--amber-bright); font-weight: 600; }
+    .f-summary .bad { color: var(--red-bright); font-weight: 700; }
+    .f-summary.outage { background: #2a1420; border-color: #7f1d1d; }
+    .f-summary.outage .dot { background: var(--red); }
+    .f-summary.degraded .dot { background: var(--amber); }
+    .f-summary.stale { background: #1c1710; border-color: #57451a; }
+
+    /* Title + monitor head. */
+    .d-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid #2b333e;
+      padding-bottom: 12px;
+    }
+    h1.title { margin: 0; font-family: Inter, sans-serif; font-size: 20px; font-weight: 800; color: var(--bright); }
+    .subtitle { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+    .d-monitor { text-align: right; font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+    .d-monitor .lab { letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+    .d-monitor .big { font-size: 19px; color: var(--green-bright); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .d-monitor b { color: #e6edf3; }
+    .countdown.waiting { color: var(--amber-bright); font-size: 15px; }
+    .countdown.delayed { color: var(--red); font-size: 20px; font-weight: 700; }
+    .monitor-meta { color: var(--muted); font-size: 11.5px; }
+
+    /* Compact rows tables. */
+    .d-table { margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .d-thead { display: none; }
+    @media (min-width: 720px) {
+      .d-thead {
+        display: grid;
+        grid-template-columns: 14px 190px 110px 90px 1fr;
+        gap: 10px;
+        background: var(--panel);
+        padding: 8px 12px;
+        font-size: 10.5px;
+        letter-spacing: .09em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+    }
+    .d-row {
+      display: grid;
+      grid-template-columns: 14px 1fr auto;
+      gap: 6px 10px;
+      padding: 10px 12px;
+      border-top: 1px solid #20262f;
+      align-items: start;
+    }
+    @media (min-width: 720px) {
+      .d-row { grid-template-columns: 14px 190px 110px 90px 1fr; align-items: center; }
+      .d-count { grid-column: auto; grid-row: auto; }
+      .d-inc { grid-column: auto; grid-row: auto; }
+    }
+    .d-row:first-child { border-top: none; }
+    .d-row.deg { background: rgba(245, 158, 11, .05); }
+    .d-row.out { background: rgba(220, 38, 38, .08); }
+    .sdot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; }
+    .sdot.ok { background: var(--green); }
+    .sdot.deg { background: var(--amber); }
+    .sdot.out { background: var(--red); }
+    .sdot.unknown { background: #64748b; }
+    .d-name { font-family: Inter, sans-serif; font-weight: 700; color: var(--bright); font-size: 13.5px; }
+    .d-status { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+    .d-status.ok { color: var(--green-bright); }
+    .d-status.deg { color: var(--amber-bright); }
+    .d-status.out { color: var(--red-bright); }
+    .d-status.unknown { color: var(--muted); }
+    .d-count { color: var(--muted); font-size: 12px; }
+    .d-inc { color: #aeb9c4; font-size: 12px; line-height: 1.5; grid-column: 2 / 4; }
+    @media (max-width: 719px) {
+      /* Mobile: count sits under the name, incident below it. Scoped to
+         mobile only so the desktop 5-column placement is untouched. */
+      .d-count { grid-column: 2; grid-row: 2; }
+      .d-inc { grid-row: 3; }
+    }
+    @media (min-width: 720px) { .d-inc { grid-column: auto; } }
+    .d-inc .st { color: var(--muted); font-size: 10.5px; text-transform: uppercase; }
+    .d-group-label { margin: 16px 0 0; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+    /* X updates section. */
+    .x-section { margin-top: 16px; border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+    .x-section h2 { font-family: Inter, sans-serif; font-size: 13.5px; color: var(--bright); }
     .x-updates-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-    .x-post { border-top: 1px solid #334155; padding-top: .9rem; margin-top: .9rem; }
+    .x-post { border-top: 1px solid #20262f; padding-top: .9rem; margin-top: .9rem; }
     .x-post-time { color: var(--muted); font-size: .78rem; }
     .x-post-text { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
-    .x-feed-note { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
+    .x-feed-note { color: var(--muted); font-size: 12px; margin-top: .5rem; }
     .x-issue-warning { color: var(--yellow); font-size: .95rem; font-weight: 700; margin-top: .9rem; }
-    footer {
-      margin-top: 2.5rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    a { color: var(--blue); }
+
+    footer { margin-top: 12px; font-size: 11.5px; color: var(--dim); }
   </style>
 </head>
 <body>
   <div class="container">
     <div id="topAlert" class="top-alert" hidden></div>
-    <h1>Cloud Providers Status</h1>
-    <p class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</p>
-    <section class="monitor-panel" aria-live="polite">
-      <div class="monitor-label">NEXT EXPECTED CHECK</div>
-      <div class="countdown" id="countdown">Waiting for monitor data…</div>
-      <div class="monitor-meta" id="countdown-detail">GitHub Actions checks on a staggered 15-minute schedule.</div>
-      <div class="monitor-meta" id="last-check" style="margin-top:.75rem">Last monitor data update: Loading…</div>
-      <div class="monitor-meta" id="next-check">Next expected update: Loading…</div>
-    </section>
 
-    <div id="grid" class="grid">Loading…</div>
+    <div id="summaryBar" class="f-summary" aria-live="polite">
+      <span class="dot" id="summaryDot"></span>
+      <span id="summaryVerdict"><strong>Loading…</strong></span>
+      <span class="sep">·</span>
+      <span id="summaryCounts"></span>
+      <span class="sep">·</span>
+      <span id="summaryIncidents"></span>
+      <span id="summaryStale" class="warn" hidden></span>
+    </div>
+
+    <div class="d-head">
+      <div>
+        <h1 class="title">Cloud Providers Status</h1>
+        <div class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</div>
+      </div>
+      <div class="d-monitor">
+        <div><span class="lab">Next expected check</span> &nbsp;<span class="big countdown" id="countdown">Waiting for monitor data…</span></div>
+        <div id="countdown-detail" class="monitor-meta">GitHub Actions checks on a staggered 15-minute schedule.</div>
+        <div id="last-check" class="monitor-meta">Last monitor data update: Loading…</div>
+        <div id="next-check" class="monitor-meta">Next expected update: Loading…</div>
+      </div>
+    </div>
+
+    <div id="tables">Loading…</div>
 
     <footer>
       Sources: Cloudflare, DigitalOcean and Oracle status APIs; AWS and Azure RSS; Google Cloud Atom; Microsoft consumer service-health API; Microsoft 365 Status X feed via third-party RSS mirror; Outlook/Teams front-door probes<br>
@@ -126,23 +200,28 @@
   </div>
 
   <script>
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     async function load() {
       try {
         const res = await fetch('./status.json?t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
 
         // Major-only top banner: shown only when a provider is in major
-        // outage (status "outage"). Hidden for operational, degraded,
-        // error, and stale states. Scans every provider, not just the
-        // grid groups, so nothing major can hide.
+        // outage (status "outage"). Note: staleness is NOT checked here — a stale
+        // snapshot carrying an outage provider still shows the banner.
+        // Scans every provider, not just the grid groups, so nothing
+        // major can hide.
         const banner = document.getElementById('topAlert');
         const majors = Object.values(data.providers || {}).filter(p => p && p.status === 'outage');
         if (majors.length) {
           banner.innerHTML = majors.map(p => {
             const inc = (p.incidents && p.incidents[0]) || {};
             const title = inc.name || inc.title || '';
-            return `<h2>🚨 MAJOR OUTAGE: ${p.name}</h2>` +
-              (title ? `<p>${title}</p>` : '') +
+            return `<h2>🚨 MAJOR OUTAGE: ${esc(p.name)}</h2>` +
+              (title ? `<p>${esc(title)}</p>` : '') +
               `<p>Many websites/services running on or behind this provider may be down.</p>` +
               `<p class="meta">Last update: ${new Date(data.updated_at).toLocaleString()}</p>`;
           }).join('');
@@ -152,61 +231,125 @@
           banner.hidden = true;
         }
 
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
+        const providers = data.providers || {};
+        const mainKeys = ['cloudflare', 'aws', 'gcp', 'digitalocean', 'oracle'];
+        const msKeys = ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams', 'outlook_front_door', 'teams_front_door'];
+        const allKeys = mainKeys.concat(msKeys);
 
-        const groups = [
-          {
-            title: null,
-            keys: ['cloudflare', 'aws', 'gcp', 'digitalocean', 'oracle']
-          },
-          {
-            title: 'Microsoft',
-            keys: ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams', 'outlook_front_door', 'teams_front_door']
-          }
-        ];
-        for (const group of groups) {
-          if (group.title) {
-            const heading = document.createElement('h2');
-            heading.className = 'group-heading';
-            heading.textContent = group.title;
-            grid.appendChild(heading);
-          }
-          for (const key of group.keys) {
-            const p = data.providers[key];
-            if (!p) continue;
+        // Summary bar: overall verdict, degraded/operational counts,
+        // total incidents. Red in outage state, amber in stale state.
+        const present = allKeys.map(k => providers[k]).filter(Boolean);
+        const outages = present.filter(p => p.status === 'outage').length;
+        const degraded = present.filter(p => p.status === 'degraded').length;
+        // error/unknown: real states (check.py sets "error" on feed fetch
+        // failure; rowHtml defaults a missing status to "unknown"). Any
+        // status that is not operational/degraded/outage counts here, so
+        // the verdict can never contradict the rows below it.
+        const issues = present.filter(p => {
+          const st = p.status || 'unknown';
+          return st !== 'operational' && st !== 'degraded' && st !== 'outage';
+        }).length;
+        const operational = present.filter(p => p.status === 'operational').length;
+        const totalIncidents = present.reduce((n, p) => n + ((p.incidents && p.incidents.length) || 0), 0);
 
-            const card = document.createElement('div');
-          card.className = 'card ' + (p.status || 'unknown');
+        const bar = document.getElementById('summaryBar');
+        const verdict = document.getElementById('summaryVerdict');
+        if (outages > 0) {
+          bar.classList.add('outage');
+          bar.classList.remove('degraded');
+          verdict.innerHTML = `<strong class="bad">${outages} outage${outages === 1 ? '' : 's'}</strong>`;
+        } else if (degraded > 0 || issues > 0) {
+          bar.classList.remove('outage');
+          bar.classList.add('degraded');
+          const parts = [];
+          if (degraded > 0) parts.push(`${degraded} degraded`);
+          if (issues > 0) parts.push(`${issues} with issues`);
+          verdict.innerHTML = `<strong>${parts.join(' · ')}</strong>`;
+        } else {
+          bar.classList.remove('outage');
+          bar.classList.remove('degraded');
+          verdict.innerHTML = `<strong>All systems operational</strong>`;
+        }
+        document.getElementById('summaryCounts').textContent =
+          `${operational} of ${present.length} operational`;
+        document.getElementById('summaryIncidents').textContent =
+          `${totalIncidents} incident${totalIncidents === 1 ? '' : 's'} listed`;
 
-          let incidentsHtml = '';
-          if (p.incidents && p.incidents.length) {
-            incidentsHtml = '<ul class="incidents">' +
-              p.incidents.slice(0, 3).map(i => {
-                const title = i.name || i.title || 'Incident';
-                return `<li>${title}</li>`;
-              }).join('') +
-              '</ul>';
-          }
-
-          card.innerHTML = `
-            <h2>${p.name}</h2>
-            <div class="status ${p.status}">
-              <span class="dot"></span>
-              ${p.status || 'unknown'}
-            </div>
-            <div class="meta">${p.description || ''}</div>
-            ${incidentsHtml}
-            <div class="meta" style="margin-top:0.75rem">Checked: ${p.checked_at ? new Date(p.checked_at).toLocaleString() : 'Awaiting first check'}</div>
-          `;
-            grid.appendChild(card);
-          }
+        // Stale state (carried over from PR #7): data more than 20
+        // minutes old — the same threshold as the DELAYED countdown
+        // (expected check at last update + 15 min, overdue by more than
+        // 5 min). The bar turns amber and names the age; no separate
+        // strip element. Hidden when fresh. Reuses updated_at; no
+        // checker change.
+        const staleEl = document.getElementById('summaryStale');
+        const dataAgeMin = (Date.now() - new Date(data.updated_at).getTime()) / 60000;
+        if (!Number.isNaN(dataAgeMin) && dataAgeMin > 20) {
+          const mins = Math.floor(dataAgeMin);
+          bar.classList.add('stale');
+          staleEl.textContent = `· Data ${mins} min old — may be out of date`;
+          staleEl.hidden = false;
+        } else {
+          bar.classList.remove('stale');
+          staleEl.textContent = '';
+          staleEl.hidden = true;
         }
 
-        const xFeed = data.providers && data.providers.microsoft_365_x;
+        // Compact rows tables.
+        const tables = document.getElementById('tables');
+        tables.innerHTML = '';
+
+        function rowHtml(p) {
+          const status = p.status || 'unknown';
+          const dotClass = status === 'operational' ? 'ok'
+            : status === 'degraded' ? 'deg'
+            : (status === 'outage' || status === 'error') ? 'out' : 'unknown';
+          const rowClass = status === 'degraded' ? 'deg'
+            : (status === 'outage' || status === 'error') ? 'out' : '';
+          const count = (p.incidents && p.incidents.length) || 0;
+          const countText = count === 0 ? '0'
+            : (status === 'degraded' || status === 'outage' || status === 'error')
+              ? `${count} active` : `${count} on record`;
+          let incHtml = '—';
+          if (p.incidents && p.incidents.length) {
+            incHtml = p.incidents.slice(0, 3).map(i => {
+              const title = esc(i.name || i.title || 'Incident');
+              const st = i.status ? ` <span class="st">${esc(i.status)}</span>` : '';
+              return `${title}${st}`;
+            }).join(' · ');
+          }
+          return `<div class="d-row ${rowClass}">` +
+            `<span class="sdot ${dotClass}"></span>` +
+            `<span class="d-name">${esc(p.name)}</span>` +
+            `<span class="d-status ${dotClass}">${esc(status)}</span>` +
+            `<span class="d-count">${esc(countText)}</span>` +
+            `<span class="d-inc">${incHtml}</span>` +
+            `</div>`;
+        }
+
+        function tableHtml(keys, withHead) {
+          let html = '<div class="d-table">';
+          if (withHead) {
+            html += '<div class="d-thead"><span></span><span>Provider</span><span>Status</span><span>Incidents</span><span>Latest incident</span></div>';
+          }
+          for (const key of keys) {
+            const p = providers[key];
+            if (!p) continue;
+            html += rowHtml(p);
+          }
+          return html + '</div>';
+        }
+
+        tables.innerHTML += tableHtml(mainKeys, true);
+        const msLabel = document.createElement('p');
+        msLabel.className = 'd-group-label';
+        msLabel.textContent = 'Microsoft';
+        tables.appendChild(msLabel);
+        tables.innerHTML += tableHtml(msKeys, false);
+
+        const xFeed = providers.microsoft_365_x;
         if (xFeed) {
-          const card = document.createElement('section');
-          card.className = 'card x-updates-card';
+          const section = document.createElement('section');
+          section.className = 'x-section';
           const header = document.createElement('div');
           header.className = 'x-updates-header';
           const heading = document.createElement('h2');
@@ -218,30 +361,30 @@
           account.rel = 'noopener noreferrer';
           account.textContent = '@MSFT365Status';
           header.appendChild(account);
-          card.appendChild(header);
+          section.appendChild(header);
 
           const note = document.createElement('p');
           note.className = 'x-feed-note';
           note.textContent = 'Actual posts published today in Central Time · ' + (xFeed.date_ct || 'date unavailable');
-          card.appendChild(note);
+          section.appendChild(note);
 
           if (xFeed.retrieval_status !== 'ok') {
             const unavailable = document.createElement('p');
             unavailable.className = 'x-feed-note';
             unavailable.textContent = 'SOURCE UNAVAILABLE — X feed retrieval failed. No conclusion can be drawn about whether Microsoft posted today.';
-            card.appendChild(unavailable);
+            section.appendChild(unavailable);
           } else if (!Array.isArray(xFeed.posts) || xFeed.posts.length === 0) {
             const empty = document.createElement('p');
             empty.className = 'x-feed-note';
             empty.textContent = 'No posts from @MSFT365Status were returned for today (Central Time). Older posts are excluded.';
-            card.appendChild(empty);
+            section.appendChild(empty);
           } else {
             for (const post of xFeed.posts) {
               if (post.possible_issue) {
                 const warn = document.createElement('p');
                 warn.className = 'x-issue-warning';
                 warn.textContent = '⚠️ Possible enterprise issue — via X (unofficial, not confirmed)';
-                card.appendChild(warn);
+                section.appendChild(warn);
               }
               const item = document.createElement('article');
               item.className = 'x-post';
@@ -261,15 +404,15 @@
                 link.textContent = 'View original post on X';
                 item.appendChild(link);
               }
-              card.appendChild(item);
+              section.appendChild(item);
             }
           }
 
           const checked = document.createElement('p');
           checked.className = 'x-feed-note';
           checked.textContent = 'Last retrieval: ' + (xFeed.checked_at ? new Date(xFeed.checked_at).toLocaleString() : 'Unknown') + ' · Feed: third-party RSS mirror';
-          card.appendChild(checked);
-          grid.appendChild(card);
+          section.appendChild(checked);
+          tables.appendChild(section);
         }
 
         lastUpdate = new Date(data.updated_at);
@@ -288,7 +431,7 @@
         }
         tickCountdown();
       } catch (e) {
-        document.getElementById('grid').textContent = 'Failed to load status.json';
+        document.getElementById('tables').textContent = 'Failed to load status.json';
       }
     }
 
