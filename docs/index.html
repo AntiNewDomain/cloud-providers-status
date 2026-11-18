@@ -44,56 +44,69 @@
       font-family: Inter, sans-serif;
       font-size: 13.5px;
       border-radius: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .top-alert[hidden] { display: none; }
     .top-alert h2 { font-size: 1.1rem; }
     .top-alert p { font-size: 0.95rem; font-weight: 400; }
     .top-alert .meta { color: #fecaca; }
 
-    /* Slim status summary bar — the at-a-glance verdict. */
+    /* Slim status summary bar — the at-a-glance verdict. Flush strip
+       (design F): background only + bottom border, no radius, no
+       margin; negative margins break it out of the container padding
+       so it spans the full panel width, flush against the top edge. */
     .f-summary {
       display: flex;
       flex-wrap: wrap;
       gap: 6px 18px;
       align-items: center;
       background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      border-bottom: 1px solid var(--border);
       padding: 9px 14px;
       font-size: 12.5px;
       color: #aeb9c4;
-      margin-bottom: 16px;
+      margin: -16px -12px 0;
     }
     .f-summary .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); flex: none; }
     .f-summary strong { color: var(--bright); font-family: Inter, sans-serif; font-size: 13px; }
     .f-summary .sep { color: #3a434e; }
     .f-summary .warn { color: var(--amber-bright); font-weight: 600; }
     .f-summary .bad { color: var(--red-bright); font-weight: 700; }
-    .f-summary.outage { background: #2a1420; border-color: #7f1d1d; }
+    .f-summary.outage { background: #2a1420; border-bottom-color: #7f1d1d; }
     .f-summary.outage .dot { background: var(--red); }
     .f-summary.degraded .dot { background: var(--amber); }
-    .f-summary.stale { background: #1c1710; border-color: #57451a; }
+    .f-summary.stale { background: #1c1710; border-bottom-color: #57451a; }
 
-    /* Title + monitor head. */
+    /* Title + monitor head. margin-top restores the 16px gap below the
+       flush summary strip (the strip itself carries no margin). */
     .d-head {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       justify-content: space-between;
       align-items: flex-end;
       border-bottom: 2px solid #2b333e;
       padding-bottom: 12px;
+      margin-top: 16px;
     }
     h1.title { margin: 0; font-family: Inter, sans-serif; font-size: 20px; font-weight: 800; color: var(--bright); }
     .subtitle { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
-    .d-monitor { text-align: right; font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+    /* Monitor panel kept narrow (11px, 8px head gap) so the header stays
+       one row at desktop width even in stale state, when the "N min ago ·
+       OVERDUE" suffix makes the Last-update line the widest. */
+    .d-monitor { text-align: right; font-size: 11px; color: var(--muted); line-height: 1.7; }
     .d-monitor .lab { letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
     .d-monitor .big { font-size: 19px; color: var(--green-bright); font-weight: 600; font-variant-numeric: tabular-nums; }
     .d-monitor b { color: #e6edf3; }
     .countdown.waiting { color: var(--amber-bright); font-size: 15px; }
-    .countdown.delayed { color: var(--red); font-size: 20px; font-weight: 700; }
-    .monitor-meta { color: var(--muted); font-size: 11.5px; }
+    .countdown.delayed { color: var(--amber-bright); font-size: 19px; font-weight: 700; }
+    .monitor-meta { color: var(--muted); font-size: 11px; }
+    .stale-suffix { color: var(--amber-bright); }
+
+    /* Amber stale bar above the tables (design F): shown when data is
+       stale, hidden when fresh. */
+    .d-stale { margin-top: 10px; background: #1c1710; border: 1px solid #57451a; color: #e8c96a; padding: 8px 12px; font-size: 12px; border-radius: 4px; }
+    .d-stale[hidden] { display: none; }
 
     /* Compact rows tables. */
     .d-table { margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
@@ -139,6 +152,16 @@
     .d-status.deg { color: var(--amber-bright); }
     .d-status.out { color: var(--red-bright); }
     .d-status.unknown { color: var(--muted); }
+    /* Front-door probe indicator, folded into the parent row (PR #9
+       probes stay as separate keys in status.json; they are no longer
+       separate rows). Sits under the parent's own status; the parent's
+       status, dot and row colour never change because of a probe. */
+    .d-statuscell { display: flex; flex-direction: column; gap: 2px; }
+    .d-probe { font-size: 10px; font-weight: 600; white-space: normal; }
+    .d-probe.ok { color: var(--green-bright); }
+    .d-probe.bad { color: var(--amber-bright); }
+    .d-probe.unknown { color: var(--muted); }
+    .d-probe-warn { color: var(--amber-bright); font-weight: 700; }
     .d-count { color: var(--muted); font-size: 12px; }
     .d-inc { color: #aeb9c4; font-size: 12px; line-height: 1.5; grid-column: 2 / 4; }
     @media (max-width: 719px) {
@@ -184,12 +207,13 @@
         <div class="subtitle">Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute</div>
       </div>
       <div class="d-monitor">
-        <div><span class="lab">Next expected check</span> &nbsp;<span class="big countdown" id="countdown">Waiting for monitor data…</span></div>
-        <div id="countdown-detail" class="monitor-meta">GitHub Actions checks on a staggered 15-minute schedule.</div>
-        <div id="last-check" class="monitor-meta">Last monitor data update: Loading…</div>
-        <div id="next-check" class="monitor-meta">Next expected update: Loading…</div>
+        <div><span class="lab">Next expected check</span> &nbsp;<span class="big countdown" id="countdown">WAITING…</span></div>
+        <div id="last-check" class="monitor-meta">Last update: Loading…</div>
+        <div class="monitor-meta">Monitor: <b>running</b> · interval ~15 min</div>
       </div>
     </div>
+
+    <div id="staleBar" class="d-stale" hidden></div>
 
     <div id="tables">Loading…</div>
 
@@ -233,7 +257,12 @@
 
         const providers = data.providers || {};
         const mainKeys = ['cloudflare', 'aws', 'gcp', 'digitalocean', 'oracle'];
-        const msKeys = ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams', 'outlook_front_door', 'teams_front_door'];
+        const msKeys = ['azure', 'm365_consumer', 'm365_copilot', 'outlook_com', 'microsoft_teams'];
+        // Front-door probes are folded into their parent rows (Chairman,
+        // Nov 17): they are NOT separate providers and are NOT counted
+        // in the summary bar (10 providers, 10 rows). check.py still
+        // writes them as separate keys in status.json.
+        const probeFor = { outlook_com: 'outlook_front_door', microsoft_teams: 'teams_front_door' };
         const allKeys = mainKeys.concat(msKeys);
 
         // Summary bar: overall verdict, degraded/operational counts,
@@ -257,7 +286,13 @@
         if (outages > 0) {
           bar.classList.add('outage');
           bar.classList.remove('degraded');
-          verdict.innerHTML = `<strong class="bad">${outages} outage${outages === 1 ? '' : 's'}</strong>`;
+          // Outage state still shows the degraded count alongside the
+          // outage count (design F), same parts pattern as below.
+          const parts = [];
+          if (degraded > 0) parts.push(`<strong>${degraded} degraded</strong>`);
+          parts.push(`<strong class="bad">${outages} outage${outages === 1 ? '' : 's'}</strong>`);
+          if (issues > 0) parts.push(`<strong>${issues} with issues</strong>`);
+          verdict.innerHTML = parts.join(' · ');
         } else if (degraded > 0 || issues > 0) {
           bar.classList.remove('outage');
           bar.classList.add('degraded');
@@ -276,29 +311,33 @@
           `${totalIncidents} incident${totalIncidents === 1 ? '' : 's'} listed`;
 
         // Stale state (carried over from PR #7): data more than 20
-        // minutes old — the same threshold as the DELAYED countdown
+        // minutes old — the same threshold as the OVERDUE countdown
         // (expected check at last update + 15 min, overdue by more than
-        // 5 min). The bar turns amber and names the age; no separate
-        // strip element. Hidden when fresh. Reuses updated_at; no
-        // checker change.
+        // 5 min). The bar turns amber and names the age, and the amber
+        // stale bar above the tables (design F) is shown; both hidden
+        // when fresh. Reuses updated_at; no checker change.
         const staleEl = document.getElementById('summaryStale');
+        const staleBar = document.getElementById('staleBar');
         const dataAgeMin = (Date.now() - new Date(data.updated_at).getTime()) / 60000;
         if (!Number.isNaN(dataAgeMin) && dataAgeMin > 20) {
           const mins = Math.floor(dataAgeMin);
           bar.classList.add('stale');
           staleEl.textContent = `· Data ${mins} min old — may be out of date`;
           staleEl.hidden = false;
+          staleBar.innerHTML = `⚠ <strong>STALE</strong> — data is ${mins} minutes old (expected ~15). Rows below show the last known state.`;
+          staleBar.hidden = false;
         } else {
           bar.classList.remove('stale');
           staleEl.textContent = '';
           staleEl.hidden = true;
+          staleBar.hidden = true;
         }
 
         // Compact rows tables.
         const tables = document.getElementById('tables');
         tables.innerHTML = '';
 
-        function rowHtml(p) {
+        function rowHtml(p, probe) {
           const status = p.status || 'unknown';
           const dotClass = status === 'operational' ? 'ok'
             : status === 'degraded' ? 'deg'
@@ -317,10 +356,30 @@
               return `${title}${st}`;
             }).join(' · ');
           }
+          // Probe indicator next to the parent's own status. A failed
+          // probe (status "error", 3 consecutive failures) shows an
+          // amber warning in the row, but the parent's status, dot and
+          // row colour stay exactly as reported — a probe can never
+          // turn a parent into "outage" or raise the banner/alerts.
+          let probeHtml = '';
+          if (probe) {
+            const pst = probe.status || 'unknown';
+            if (pst === 'error') {
+              const fails = (typeof probe.consecutive_failures === 'number' && probe.consecutive_failures >= 3)
+                ? probe.consecutive_failures : 3;
+              probeHtml = `<span class="d-probe bad">⚠️ Front door down</span>`;
+              const warnHtml = `<span class="d-probe-warn">⚠️ Front door unreachable (${fails} failed checks)</span>`;
+              incHtml = incHtml === '—' ? warnHtml : incHtml + ' · ' + warnHtml;
+            } else if (pst === 'operational') {
+              probeHtml = `<span class="d-probe ok">Front door OK</span>`;
+            } else {
+              probeHtml = `<span class="d-probe unknown">Front door unknown</span>`;
+            }
+          }
           return `<div class="d-row ${rowClass}">` +
             `<span class="sdot ${dotClass}"></span>` +
             `<span class="d-name">${esc(p.name)}</span>` +
-            `<span class="d-status ${dotClass}">${esc(status)}</span>` +
+            `<div class="d-statuscell"><span class="d-status ${dotClass}">${esc(status)}</span>${probeHtml}</div>` +
             `<span class="d-count">${esc(countText)}</span>` +
             `<span class="d-inc">${incHtml}</span>` +
             `</div>`;
@@ -334,7 +393,7 @@
           for (const key of keys) {
             const p = providers[key];
             if (!p) continue;
-            html += rowHtml(p);
+            html += rowHtml(p, providers[probeFor[key]]);
           }
           return html + '</div>';
         }
@@ -417,17 +476,24 @@
 
         lastUpdate = new Date(data.updated_at);
         document.querySelector('.subtitle').textContent =
-          'Live status from official sources · Checks scheduled every 15 minutes';
+          'Live status from official sources · Checks about every 15 minutes · Dashboard refreshes every minute';
 
         const lastEl = document.getElementById('last-check');
-        const nextEl = document.getElementById('next-check');
         if (Number.isNaN(lastUpdate.getTime())) {
-          lastEl.textContent = 'Last monitor data update: Unknown';
-          nextEl.textContent = 'Next expected update: Unknown';
+          lastEl.textContent = 'Last update: Unknown';
         } else {
-          lastEl.textContent = 'Last monitor data update: ' + lastUpdate.toLocaleString();
-          const nextTime = new Date(lastUpdate.getTime() + 15 * 60 * 1000);
-          nextEl.textContent = 'Next expected update: ' + nextTime.toLocaleString();
+          // Time only (no date): fresh data is always within 20 minutes,
+          // so the time is unambiguous — and it keeps the monitor panel
+          // narrow enough for the header to stay one row. When stale,
+          // an amber "N min ago · OVERDUE" suffix is appended (design F).
+          const timeStr = lastUpdate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+          if (!Number.isNaN(dataAgeMin) && dataAgeMin > 20) {
+            const mins = Math.floor(dataAgeMin);
+            lastEl.innerHTML = 'Last update: ' + esc(timeStr) +
+              `<span class="stale-suffix"> · ${mins} min ago · OVERDUE</span>`;
+          } else {
+            lastEl.textContent = 'Last update: ' + timeStr;
+          }
         }
         tickCountdown();
       } catch (e) {
@@ -438,12 +504,10 @@
     let lastUpdate = null;
     function tickCountdown() {
       const el = document.getElementById('countdown');
-      const detail = document.getElementById('countdown-detail');
-      if (!el || !detail) return;
+      if (!el) return;
       if (!lastUpdate || Number.isNaN(lastUpdate.getTime())) {
-        el.className = 'countdown waiting';
-        el.textContent = 'Waiting for monitor data…';
-        detail.textContent = 'No valid monitor timestamp is available yet.';
+        el.className = 'big countdown waiting';
+        el.textContent = 'WAITING…';
         return;
       }
 
@@ -457,18 +521,17 @@
         const secs = Math.ceil(remaining / 1000);
         const mins = Math.floor(secs / 60);
         const seconds = String(secs % 60).padStart(2, '0');
-        el.className = 'countdown';
+        el.className = 'big countdown';
         el.textContent = `${mins}:${seconds}`;
-        detail.textContent = 'Until the next expected dispatch · GitHub startup and queue time are additional.';
       } else if (overdue <= 5 * 60 * 1000) {
-        el.className = 'countdown waiting';
-        el.textContent = 'Check due — waiting for GitHub Actions';
-        detail.textContent = 'The 15:00 countdown has elapsed. Waiting for GitHub Actions to start and publish new data.';
+        // Check due but not yet stale: short label keeps the header
+        // one row (the old "Check due — waiting for GitHub Actions"
+        // text was wide enough to wrap it).
+        el.className = 'big countdown waiting';
+        el.textContent = 'WAITING';
       } else {
-        const lateMins = Math.floor(overdue / 60000);
-        el.className = 'countdown delayed';
-        el.textContent = 'DELAYED';
-        detail.textContent = `No new monitor data ${lateMins} minute(s) after the expected check. Showing the last recorded results.`;
+        el.className = 'big countdown delayed';
+        el.textContent = 'OVERDUE';
       }
     }
     tickCountdown();
