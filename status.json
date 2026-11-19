@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-19T10:15:34.502004+00:00",
+  "updated_at": "2026-11-19T10:30:21.321294+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,7 +15,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-19T10:15:30.954732+00:00",
+      "checked_at": "2026-11-19T10:30:18.316859+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -46,7 +46,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-19T10:15:30.989684+00:00",
+      "checked_at": "2026-11-19T10:30:18.564925+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -55,7 +55,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.090289+00:00",
+      "checked_at": "2026-11-19T10:30:18.663356+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -72,7 +72,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-19T10:15:31.142533+00:00",
+      "checked_at": "2026-11-19T10:30:18.736503+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -89,7 +89,7 @@
           "updated": "2026-11-19T05:46:29.185Z"
         }
       ],
-      "checked_at": "2026-11-19T10:15:31.201416+00:00",
+      "checked_at": "2026-11-19T10:30:18.831318+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -99,7 +99,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.327283+00:00",
+      "checked_at": "2026-11-19T10:30:19.055982+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -108,7 +108,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.534069+00:00",
+      "checked_at": "2026-11-19T10:30:19.107149+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -118,7 +118,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.534069+00:00",
+      "checked_at": "2026-11-19T10:30:19.107149+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -128,7 +128,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.534069+00:00",
+      "checked_at": "2026-11-19T10:30:19.107149+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -138,7 +138,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:31.534069+00:00",
+      "checked_at": "2026-11-19T10:30:19.107149+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -152,7 +152,7 @@
       "timezone": "America/Chicago",
       "posts": [],
       "today_count": 0,
-      "checked_at": "2026-11-19T10:15:31.534870+00:00",
+      "checked_at": "2026-11-19T10:30:19.109735+00:00",
       "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
@@ -165,7 +165,7 @@
       "description": "Outlook front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:33.539011+00:00",
+      "checked_at": "2026-11-19T10:30:20.927707+00:00",
       "source": "https://outlook.office.com"
     },
     "teams_front_door": {
@@ -175,7 +175,7 @@
       "description": "Teams front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-19T10:15:33.777068+00:00",
+      "checked_at": "2026-11-19T10:30:21.055073+00:00",
       "source": "https://teams.microsoft.com"
     }
   }
