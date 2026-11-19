@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-19T12:15:20.124992+00:00",
+  "updated_at": "2026-11-19T12:30:27.454266+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,7 +15,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-19T12:15:13.727370+00:00",
+      "checked_at": "2026-11-19T12:30:17.719115+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -46,7 +46,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-19T12:15:14.229327+00:00",
+      "checked_at": "2026-11-19T12:30:18.034091+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -55,7 +55,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.337997+00:00",
+      "checked_at": "2026-11-19T12:30:18.136909+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -66,13 +66,13 @@
       "incidents": [
         {
           "title": "RESOLVED: Multiple services were experiencing issues in the europe-west2 region.",
-          "summary": "<p> Incident began at <strong>2026-10-19 23:00</strong> and ended at <strong>2026-10-20 05:08</strong> <span>(all times are <strong>US/Pacific</strong>).</span></p><div class=\"cBIRi14aVDP__status-update-text\"><h1>Incident Report</h1>\n<h2>Summary</h2>\n<p>On Monday, 19 Oct 2026 at 22:53 US/Pacific (Tuesday, 20 Oct 2026, 06:53 BST), a data center facility that hosts europe-west2-b, a zone within the ...",
+          "summary": "<p> Incident began at <strong>2026-10-19 23:00</strong> and ended at <strong>2026-10-20 05:08</strong> <span>(all times are <strong>US/Pacific</strong>).</span></p><div class=\"cBIRi14aVDP__status-update-text\"># Incident Report\n\n## Summary\n\nOn Monday, 19 Oct 2026 at 22:53 US/Pacific (Tuesday, 20 Oct 2026, 06:53 BST), a data center facility that hosts europe-west2-b, a zone within the europe-west2 c...",
           "published": "2026-11-05T06:17:42+00:00",
           "severity": "resolved",
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-19T12:15:14.462450+00:00",
+      "checked_at": "2026-11-19T12:30:18.245875+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -89,7 +89,7 @@
           "updated": "2026-11-19T05:46:29.185Z"
         }
       ],
-      "checked_at": "2026-11-19T12:15:14.664642+00:00",
+      "checked_at": "2026-11-19T12:30:18.427672+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -99,7 +99,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.769946+00:00",
+      "checked_at": "2026-11-19T12:30:18.533486+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -108,7 +108,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.936517+00:00",
+      "checked_at": "2026-11-19T12:30:18.686447+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -118,7 +118,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.936517+00:00",
+      "checked_at": "2026-11-19T12:30:18.686447+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -128,7 +128,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.936517+00:00",
+      "checked_at": "2026-11-19T12:30:18.686447+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -138,7 +138,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:14.936517+00:00",
+      "checked_at": "2026-11-19T12:30:18.686447+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -152,7 +152,7 @@
       "timezone": "America/Chicago",
       "posts": [],
       "today_count": 0,
-      "checked_at": "2026-11-19T12:15:14.937340+00:00",
+      "checked_at": "2026-11-19T12:30:18.686928+00:00",
       "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
@@ -165,7 +165,7 @@
       "description": "Outlook front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:19.946625+00:00",
+      "checked_at": "2026-11-19T12:30:27.172492+00:00",
       "source": "https://outlook.office.com"
     },
     "teams_front_door": {
@@ -175,7 +175,7 @@
       "description": "Teams front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-19T12:15:20.053807+00:00",
+      "checked_at": "2026-11-19T12:30:27.322718+00:00",
       "source": "https://teams.microsoft.com"
     }
   }
