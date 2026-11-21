@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T08:45:17.904687+00:00",
+  "updated_at": "2026-11-21T09:00:21.359925+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -15,7 +15,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-21T08:45:15.247865+00:00",
+      "checked_at": "2026-11-21T09:00:17.505912+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -46,7 +46,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-21T08:45:15.448457+00:00",
+      "checked_at": "2026-11-21T09:00:17.781601+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -55,7 +55,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:15.723498+00:00",
+      "checked_at": "2026-11-21T09:00:17.856032+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -72,7 +72,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-21T08:45:15.821982+00:00",
+      "checked_at": "2026-11-21T09:00:17.957650+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -82,7 +82,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:15.976127+00:00",
+      "checked_at": "2026-11-21T09:00:18.118452+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -92,7 +92,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:16.032391+00:00",
+      "checked_at": "2026-11-21T09:00:18.241475+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -101,7 +101,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:16.109137+00:00",
+      "checked_at": "2026-11-21T09:00:18.449866+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -111,7 +111,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:16.109137+00:00",
+      "checked_at": "2026-11-21T09:00:18.449866+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -121,7 +121,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:16.109137+00:00",
+      "checked_at": "2026-11-21T09:00:18.449866+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -131,7 +131,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:16.109137+00:00",
+      "checked_at": "2026-11-21T09:00:18.449866+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -145,14 +145,20 @@
       "timezone": "America/Chicago",
       "posts": [
         {
+          "text": "The supplemental fix has successfully saturated across the remaining affected environments and impact has been remediated. For more information, look for EX1561765 in the admin center.",
+          "published_at": "2026-11-21T08:58:13+00:00",
+          "published_local": "2:58 AM CT",
+          "link": "https://x.com/MSFT365Status/status/2124064832039145773"
+        },
+        {
           "text": "The deployment of the supplemental fix has saturated the majority of affected environments, and we expect most users will see remediation at this time. Users actively using the new Outlook client and encountering the impact may need to close and reopen the client for the fix to take effect. Otherwise, the fix will be applied automatically the next time users open the new Outlook client. For more information, see EX1561765 in the admin center.",
           "published_at": "2026-11-21T06:27:15+00:00",
           "published_local": "12:27 AM CT",
           "link": "https://x.com/MSFT365Status/status/2124026839064547439"
         }
       ],
-      "today_count": 1,
-      "checked_at": "2026-11-21T08:45:16.110242+00:00",
+      "today_count": 2,
+      "checked_at": "2026-11-21T09:00:18.450707+00:00",
       "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
@@ -165,7 +171,7 @@
       "description": "Outlook front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:17.620191+00:00",
+      "checked_at": "2026-11-21T09:00:21.182526+00:00",
       "source": "https://outlook.office.com"
     },
     "teams_front_door": {
@@ -175,7 +181,7 @@
       "description": "Teams front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-21T08:45:17.788191+00:00",
+      "checked_at": "2026-11-21T09:00:21.295417+00:00",
       "source": "https://teams.microsoft.com"
     }
   }
