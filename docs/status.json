@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T05:15:23.297991+00:00",
+  "updated_at": "2026-11-21T05:30:20.965984+00:00",
   "providers": {
     "cloudflare": {
       "provider": "cloudflare",
@@ -21,7 +21,7 @@
           "updated": "2026-11-11T05:05:06.331Z"
         }
       ],
-      "checked_at": "2026-11-21T05:15:18.646577+00:00",
+      "checked_at": "2026-11-21T05:30:18.473158+00:00",
       "source": "https://www.cloudflarestatus.com/api/v2/summary.json"
     },
     "aws": {
@@ -52,7 +52,7 @@
           "link": "https://status.aws.amazon.com/"
         }
       ],
-      "checked_at": "2026-11-21T05:15:18.941752+00:00",
+      "checked_at": "2026-11-21T05:30:18.673841+00:00",
       "source": "https://status.aws.amazon.com/rss/all.rss"
     },
     "azure": {
@@ -61,7 +61,7 @@
       "status": "operational",
       "description": "Latest items from official feed (0 recent)",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.056007+00:00",
+      "checked_at": "2026-11-21T05:30:18.767862+00:00",
       "source": "https://rssfeed.azure.status.microsoft/en-us/status/feed/"
     },
     "gcp": {
@@ -78,7 +78,7 @@
           "link": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj"
         }
       ],
-      "checked_at": "2026-11-21T05:15:19.195393+00:00",
+      "checked_at": "2026-11-21T05:30:18.862850+00:00",
       "source": "https://status.cloud.google.com/en/feed.atom"
     },
     "digitalocean": {
@@ -88,7 +88,7 @@
       "description": "All Systems Operational",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.381941+00:00",
+      "checked_at": "2026-11-21T05:30:18.934840+00:00",
       "source": "https://status.digitalocean.com/api/v2/summary.json"
     },
     "oracle": {
@@ -98,7 +98,7 @@
       "description": "Normal Performance",
       "indicator": "none",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.527876+00:00",
+      "checked_at": "2026-11-21T05:30:19.051390+00:00",
       "source": "https://ocistatus.oraclecloud.com/api/v2/status.json"
     },
     "m365_consumer": {
@@ -107,7 +107,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.679600+00:00",
+      "checked_at": "2026-11-21T05:30:19.212284+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -117,7 +117,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.679600+00:00",
+      "checked_at": "2026-11-21T05:30:19.212284+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -127,7 +127,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.679600+00:00",
+      "checked_at": "2026-11-21T05:30:19.212284+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -137,7 +137,7 @@
       "status": "operational",
       "description": "Microsoft's official consumer status reports this service operational.",
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:19.679600+00:00",
+      "checked_at": "2026-11-21T05:30:19.212284+00:00",
       "source": "https://status.cloud.microsoft/api/posts/m365Consumer",
       "status_page": "https://status.cloud.microsoft/"
     },
@@ -151,52 +151,52 @@
       "timezone": "America/Chicago",
       "posts": [
         {
-          "text": "R to @MSFT365Status: We've successfully validated our secondary fix within our internal testing environments and are proceeding with a scaled approach to its broader deployment to ensure resilient recovery across all affected environments. We'll provide an estimated completion time as one becomes available. For more information, see EX1561765 in the admin center.",
+          "text": "We've successfully validated our secondary fix within our internal testing environments and are proceeding with a scaled approach to its broader deployment to ensure resilient recovery across all affected environments. We'll provide an estimated completion time as one becomes available. For more information, see EX1561765 in the admin center.",
           "published_at": "2026-11-21T02:24:56+00:00",
           "published_local": "8:24 PM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123965857508241856#m"
+          "link": "https://x.com/MSFT365Status/status/2123965857508241856"
         },
         {
-          "text": "R to @MSFT365Status: We've developed a secondary fix to address the remaining impact when opening/saving specific attachment types. We're performing final validations on this fix before deploying to the affected environment. For more information, see EX1561765 in the admin center.",
+          "text": "We've developed a secondary fix to address the remaining impact when opening/saving specific attachment types. We're performing final validations on this fix before deploying to the affected environment. For more information, see EX1561765 in the admin center.",
           "published_at": "2026-11-21T00:33:03+00:00",
           "published_local": "6:33 PM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123937699895615664#m"
+          "link": "https://x.com/MSFT365Status/status/2123937699895615664"
         },
         {
-          "text": "R to @MSFT365Status: Our initial fix has completed its deployment, resolving impact for the majority of users. We confirmed, however, that a small percentage of attachments are still unable to be opened and saved. We're in the process of developing a secondary fix to resolve this issue in full. For more information, see EX1561765 in the admin center.",
+          "text": "Our initial fix has completed its deployment, resolving impact for the majority of users. We confirmed, however, that a small percentage of attachments are still unable to be opened and saved. We're in the process of developing a secondary fix to resolve this issue in full. For more information, see EX1561765 in the admin center.",
           "published_at": "2026-11-20T22:49:10+00:00",
           "published_local": "4:49 PM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123911558031912981#m"
+          "link": "https://x.com/MSFT365Status/status/2123911558031912981"
         },
         {
-          "text": "R to @MSFT365Status: We've begun deploying the fix and expect it may reach affected users within the next few hours, by November 21, 2026, at 2:00 AM UTC. We'll continue to monitor its progress and will provide an updated timeline for resolution as it becomes available. For more information, please see EX1561765 in the Microsoft 365 admin center.",
+          "text": "We've begun deploying the fix and expect it may reach affected users within the next few hours, by November 21, 2026, at 2:00 AM UTC. We'll continue to monitor its progress and will provide an updated timeline for resolution as it becomes available. For more information, please see EX1561765 in the Microsoft 365 admin center.",
           "published_at": "2026-11-20T21:10:19+00:00",
           "published_local": "3:10 PM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123886680352403867#m"
+          "link": "https://x.com/MSFT365Status/status/2123886680352403867"
         },
         {
-          "text": "R to @MSFT365Status: We identified a potential fix and performed tests validating its efficacy, which have yielded positive results. We're monitoring closely as the fix moves through our internal environment, and will confirm an ETA for worldwide rollout as soon as it's available. For more information, please refer to EX1561765 in the Microsoft 365 admin center.",
+          "text": "We identified a potential fix and performed tests validating its efficacy, which have yielded positive results. We're monitoring closely as the fix moves through our internal environment, and will confirm an ETA for worldwide rollout as soon as it's available. For more information, please refer to EX1561765 in the Microsoft 365 admin center.",
           "published_at": "2026-11-20T19:48:04+00:00",
           "published_local": "1:48 PM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123865981579596083#m"
+          "link": "https://x.com/MSFT365Status/status/2123865981579596083"
         },
         {
-          "text": "R to @MSFT365Status: Our investigation has identified a potential issue affecting how attachments are processed in the new Outlook client. We're further reviewing the impacting code path to determine next steps, and encourage users to leverage Outlook on the web or Outlook classic as a workaround in the interim. More information is available in the Microsoft 365 admin center under EX1561765.",
+          "text": "Our investigation has identified a potential issue affecting how attachments are processed in the new Outlook client. We're further reviewing the impacting code path to determine next steps, and encourage users to leverage Outlook on the web or Outlook classic as a workaround in the interim. More information is available in the Microsoft 365 admin center under EX1561765.",
           "published_at": "2026-11-20T17:30:52+00:00",
           "published_local": "11:30 AM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123831455050535204#m"
+          "link": "https://x.com/MSFT365Status/status/2123831455050535204"
         },
         {
           "text": "We're investigating reports of issues uploading attachments in New Outlook. Uploading attachments in Outlook on the web and Outlook classic are unaffected. For more information, see EX1561765 in the Microsoft 365 admin center.",
           "published_at": "2026-11-20T16:27:14+00:00",
           "published_local": "10:27 AM CT",
-          "link": "http://nitter.mie.foundation/MSFT365Status/status/2123815442082861308#m",
+          "link": "https://x.com/MSFT365Status/status/2123815442082861308",
           "possible_issue": true
         }
       ],
       "today_count": 7,
-      "checked_at": "2026-11-21T05:15:19.680465+00:00",
-      "source": "https://nitter.mie.foundation/MSFT365Status/rss",
+      "checked_at": "2026-11-21T05:30:19.213156+00:00",
+      "source": "https://fxtwitter.com/MSFT365Status/feed.xml?count=50",
       "account_url": "https://x.com/MSFT365Status",
       "description": "Actual posts published today, Central Time. Retrieved through a third-party RSS mirror.",
       "possible_issue": true
@@ -208,7 +208,7 @@
       "description": "Outlook front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:23.082917+00:00",
+      "checked_at": "2026-11-21T05:30:20.608461+00:00",
       "source": "https://outlook.office.com"
     },
     "teams_front_door": {
@@ -218,7 +218,7 @@
       "description": "Teams front door reachable \u2014 the front door loads and redirects to the Microsoft login page. A green probe only proves the front door loads, not that the service works.",
       "consecutive_failures": 0,
       "incidents": [],
-      "checked_at": "2026-11-21T05:15:23.218537+00:00",
+      "checked_at": "2026-11-21T05:30:20.787927+00:00",
       "source": "https://teams.microsoft.com"
     }
   }
